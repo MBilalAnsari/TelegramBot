@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    verifyOtp :{
+        type: Boolean,
+        default: false
+    },
     cityName :{
         type : String ,
         // required : true

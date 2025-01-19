@@ -1,84 +1,8 @@
 import bcrypt from 'bcrypt';
-import axios from "axios";
-// import express from 'express';
-import { teleGramAPI } from "../config/botConfig.js";
 import User from "../models/user.js"; // Import User model
-// import admin from "firebase-admin";
-// import serviceAccount from '../serviceKey.json' assert { type: 'json' };
 import { registerUserCallback } from './authController.js';
-// const client = require('twilio')(accountSid, authToken);
-// if (!admin.apps.length) {
-//     admin.initializeApp({
-//         credential: admin.credential.cert(serviceAccount),
-//     });
-// }
-// // Session cookie duration (e.g., 7 days)
-// const app = express();
-// app.use(express.json());
+import { sendPhoto, sendMessage } from "../utils/messageHelper.js";
 
-// // Middleware to handle requests
-// // Middleware to handle requests
-// app.post('/create-session', async (req, res) => {
-//     const idToken = req.body.idToken; // Ensure you're passing this from the client
-//     const sessionCookieDuration = 7 * 24 * 60 * 60 * 1000;  // 7 days in milliseconds
-
-//     if (!idToken) {
-//         return res.status(400).send("idToken is required");
-//     }
-
-//     try {
-//         const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn: sessionCookieDuration });
-//         res.status(200).send({ sessionCookie });
-//     } catch (error) {
-//         console.error("Error during session cookie creation:", error.message);
-//         res.status(500).send("Error creating session cookie");
-//     }
-// });
-
-
-// Helper to send messages
-const sendMessage = async (chatId, text, options) => {
-    const payload = {
-        chat_id: chatId,
-        text: text,
-        ...(options && { reply_markup: options }),
-    };
-    try {
-        const response = await axios.post(`${teleGramAPI}/sendMessage`, payload);
-        console.log("Message sent successfully:", response.data);
-    } catch (error) {
-        console.error("Error sending message:", error.response?.data || error.message);
-    }
-};
-
-// Helper to send photos
-const sendPhoto = async (chatId, photoUrl, caption, options) => {
-    const payload = {
-        chat_id: chatId,
-        photo: photoUrl,
-        caption: caption,
-        ...(options && { reply_markup: options }),
-    };
-    try {
-        const response = await axios.post(`${teleGramAPI}/sendPhoto`, payload);
-        console.log("Photo sent successfully:", response.data);
-    } catch (error) {
-        console.error("Error sending photo:", error.response?.data || error.message);
-    }
-};
-const sendOtp = async (phoneNumber, otp) => {
-    // Example using Twilio
-    const accountSid = process.env.ACC_SID; // Replace with your Twilio Account SID
-    const authToken = process.env.AUTH_OTP; // Replace with your Twilio Auth Token
-    const client = twilio(accountSid, authToken);
-
-
-    await client.messages.create({
-        body: `Your verification code is: ${otp}`,
-        from: '+1 507 448 6991', // Replace with your Twilio phone number
-        to: phoneNumber,
-    });
-};
 
 export const handleUpdates = async (req, res) => {
     const { message, callback_query } = req.body;
@@ -122,18 +46,12 @@ export const handleUpdates = async (req, res) => {
                         await sendMessage(chatId, "No phone number found for your account. Please register again.");
                         return;
                     }
-
-                    // Firebase Admin SDK: Create a verification token
-                    // const sessionInfo = await admin.auth().createSessionCookie(phoneNumber);
-                    // req.app.locals.otpSessions = req.app.locals.otpSessions || {};
-                    // req.app.locals.otpSessions[chatId] = sessionInfo;
-
                     await sendMessage(
                         chatId,
-                        `"Please enter the verification code sent to your phone number."\n` +
-                        `Please Enter your user name`
+                        "Please enter the verification code sent to your phone number." 
                     );
                     flow.step = 5; // Update flow step
+                    console.log("flowstep 5")
                 } else {
                     await sendMessage(chatId, "User not found. Please start the registration process again.");
                 }
@@ -171,27 +89,6 @@ export const handleUpdates = async (req, res) => {
         else if (data === "register_business") {
             registerUserCallback(req);
         }
-        //  else if (data === "register") {
-        //     const photoUrl = "https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg";
-        //     await sendPhoto(chatId, photoUrl, "Great! Are you signing up as an individual or a business? ???", {
-        //         inline_keyboard: [
-        //             [
-        //                 { text: "Individual", callback_data: "register_individual" },
-        //                 { text: "Business", callback_data: "register_business" },
-        //             ],
-        //             [{ text: "Back to Menu", callback_data: "back" }],
-        //         ],
-        //     });
-        // } else if (data === "register_individual") {
-        //     req.app.locals.flows = req.app.locals.flows || {};
-        //     req.app.locals.flows[chatId] = { step: 1, userType: "individual" };
-        //     await sendMessage(chatId, "Please enter your first name:");
-        // } else if (data === "register_business") {
-        //     const photoBusiness = "https://images.prismic.io/monei/41aa97d5-6257-4453-b008-62b8938d65e3_Instant_Payments.jpeg?auto=compress,format&rect=0,0,1200,700&w=1248&h=728";
-        //     await sendPhoto(chatId, photoBusiness, "Business account registration will come soon, stay tuned for more updates.", {
-        //         inline_keyboard: [[{ text: "Back", callback_data: "back" }]],
-        //     });
-        // } 
         else if (data === "back") {
 
             const photoBusiness = "https://www.everee.com/wp-content/uploads/2022/07/1489157_EmailBanner-NewOp2-600x300-300ppi_102822.png";
@@ -341,27 +238,7 @@ export const handleUpdates = async (req, res) => {
                         });
                         // delete req.app.locals.flows[chatId]; // Clear flow after completion
                     }
-                    // else if (flow.step === 5) { // Step for OTP Verification
-                    //     const enteredOtp = text;
-
-                    //     if (req.app.locals.otp && req.app.locals.otp[chatId]) {
-                    //         const generatedOtp = req.app.locals.otp[chatId];
-
-                    //         if (enteredOtp === generatedOtp.toString()) {
-                    //             // OTP verified successfully
-                    //             await sendMessage(chatId, "Your phone number has been successfully verified.");
-                    //             // flow.step = 6; // Move to the next step
-                    //             delete req.app.locals.otp[chatId]; // Clear OTP
-                    //         } else {
-                    //             // OTP mismatch
-                    //             await sendMessage(chatId, "Invalid verification code. Please try again.");
-                    //         }
-                    //     } else {
-                    //         // No OTP generated for this user
-                    //         await sendMessage(chatId, "No verification code found. Please restart the process.");
-                    //     }
-                    // }
-
+                   
 
                     else if (!flow) {
                         // Handle case when flow is not defined
@@ -373,7 +250,27 @@ export const handleUpdates = async (req, res) => {
                     console.error("Error setting password:", error.message);
                     await sendMessage(chatId, "Sorry, there was an error setting your password.");
                 }
-            } else if (flow.step === 5) {
+            } else if (flow.step === 5) { // Step for OTP Verification
+                const enteredOtp = text;
+
+                    console.log("otp aya kia" , enteredOtp) 
+                    // const generatedOtp = req.app.locals.otp[chatId];
+
+                    if (enteredOtp === "1234") {
+                        const user = await User.findOneAndUpdate({ chatId: chatId },
+                             { $set: { otpVerified: true } },
+                             { new: true });
+                        // OTP verified successfully
+                        await sendMessage(chatId, "Your phone number has been successfully verified.");
+                        await sendMessage(chatId,"Please Enter your user name")
+                        flow.step = 6; // Move to the next step
+                        // delete req.app.locals.otp[chatId]; // Clear OTP
+                    } else {
+                        // OTP mismatch
+                        await sendMessage(chatId, "Invalid verification code. Please try again.");
+                    }
+                
+            } else if (flow.step === 6) {
                 const userName = text;
                 console.log(userName, "debugging")
                 try {
@@ -388,7 +285,7 @@ export const handleUpdates = async (req, res) => {
                         await sendMessage(chatId, `Great \n` +
                             `Enter your city name to complete your Insta-pay profile 🌍🙂`
                         )
-                        flow.step = 6
+                        flow.step = 7
                     } else {
                         await sendMessage(chatId, "Sorry, there was an error with username. Please try again.");
                     }
@@ -399,7 +296,7 @@ export const handleUpdates = async (req, res) => {
                     console.error("Error updating username:", error.message);
                     await sendMessage(chatId, "Sorry, there was an error updating your username.");
                 }
-            } else if (flow.step === 6) {
+            } else if (flow.step === 7) {
                 const cityName = text;
                 console.log(cityName, "debugging")
                 try {
