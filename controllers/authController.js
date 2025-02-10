@@ -10,7 +10,7 @@ export const registerUserCallback = async (req, res) => {
         if (data === "register") {
             const photoUrl = "https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg";
             await sendPhoto(chatId, photoUrl, "Great! Are you signing up as an individual or a business?", {
-                inline_keyboard: [
+                inline_keyboard: [ 
                     [
                         { text: "Individual", callback_data: "register_individual" },
                         { text: "Business", callback_data: "register_business" },
