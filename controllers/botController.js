@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
-import TelegramBot from '../models/user.js';
-import User from "../models/user.js"; // Import User model
+// import TelegramBot from '../models/User.js';
+import { TelegramBot, User } from "../models/User.js"; // Import User model
 import { registerUserCallback } from './authController.js';
 import { sendPhoto, sendMessage } from "../utils/messageHelper.js";
-
+import axios from 'axios';
+import { teleGramAPI } from '../config/botConfig.js';
 
 // export const handleUpdates = async (req, res) => {
 //     const { message, callback_query } = req.body;
@@ -331,8 +332,43 @@ import { sendPhoto, sendMessage } from "../utils/messageHelper.js";
 //     res.sendStatus(200);
 // };
 
+
 export const handleUpdates = async (req) => {
     console.log("body ka data", req.body)
+    async function sendButtons(chatId, text, buttons, lastMessage) {
+        // console.log("sendBtn" , sendButtons)
+        try {
+            const response = await axios.post(`${teleGramAPI}/sendMessage`, {
+                chat_id: chatId,
+                text: text,
+                reply_markup: {
+                    inline_keyboard: buttons,
+                },
+            });
+            // console.log('Buttons sent:', response.data);
+            if (lastMessage) {
+                await updateLastMessage(chatId, lastMessage);
+            }
+        } catch (error) {
+            console.error('Error sending buttons:', error.response?.data || error.message);
+        }
+    }
+    async function updateLastMessage(chatId, lastMessage) {
+        try {
+
+            let telegramBot = await TelegramBot.findOne({ recipient: chatId });
+            if (telegramBot) {
+                telegramBot.last_message = lastMessage;
+                // console.log("telegramBot" , telegramBot)
+                await telegramBot.save();
+            } else {
+                await new TelegramBot({ recipient: chatId, last_message: lastMessage }).save();
+            }
+        } catch (error) {
+            console.error('Error updating last message:', error);
+        }
+    }
+
     const data = req.body
     let chatId;
     const currentTime = new Date();
@@ -367,178 +403,52 @@ export const handleUpdates = async (req) => {
     } else if (data.callback_query) {
         callback_query = data.callback_query.data;
         chatId = data.callback_query.message.chat.id.toString()
-        // console.log('Callback Query:', callback_query);
+        // console.log('Callback Query agayi', callback_query);
     }
-    // else if (data.edited_message) {
-    //     edited_message = data.edited_message.text;
-    //     console.log('Edited Message:', edited_message);
-    // } else {
-    //     console.log('Unknown update type:', data);
-    // }
-
     let chat = await TelegramBot.findOne({ recipient: chatId })
-    // let selectedLanguage = chat?.selected_language || chat?.account?.language || 'en'
-
-    // if (chat) {
-
-    //     // check if account is active
-    //     // if (chat?.account) {
-    //     //     if (!chat?.account?.active || chat?.account?.status !== "active") {
-    //     //         await sendMessage(chatId, 'This InstaPay account is not active right now!');
-    //     //         return;
-    //     //     }
-    //     // }
-
-    //     // // time expiry
-    //     // const lastMessageCheck = isTimeDifferenceGreaterThan30Minutes(chat.last_message_time)
-    //     // console.log({ lastMessageCheck })
-
-    //     // if (true) {
-    //     //     //  if the account is not connected, then set the last message to connect
-    //     //     if (!chat?.account_connected) {
-    //     //         await sendMessage(chatId, 'Your session has been expired!', "connect");
-    //     //         const buttonText = "How can we help you today? Let's get started!🚀👇"
-    //     //         const buttons = [
-    //     //             [{ text: lang[selectedLanguage].CONNECT_BUTTON_TITLE, callback_data: "connect_account" }],
-    //     //             [{ text: lang[selectedLanguage].REGISTER_BUTTON_TITLE, callback_data: "register" }],
-    //     //             [{ text: lang[selectedLanguage].CHANGE_LANGUAGE, callback_data: "language_change" }],
-    //     //         ];
-    //     //         await sendButtons(chatId, buttonText, buttons);
-
-    //     //         // if the account is connected, then set the last message to 4 (main_menu)
-    //     //     } else if (chat?.account_connected) {
-    //     //         await sendMessage(chatId, 'Your session has been expired!', "4")
-    //     //         await mainMenuMessage(chatId, selectedLanguage)
-
-    //     //     }
-
-    //     //     chat.last_message_time = currentTime;
-    //     //     await chat.save();
-    //     //     return
-    //     // }
-
-    //     chat.last_message_time = currentTime;
-    //     await chat.save();
+    console.log("chat", chat)
+    // if(chat && chat.last_message === text_message){
+    //     console.log("duplicate Messages" , text_message)
+    //     // ye early exit k lye
+    //     return res.sendstatus(200);
     // }
-    // else {
-    // chat = new TelegramBot({
-    //     recipient: chatId,
-    //     last_message_time: currentTime,
-    //     last_message: "connect",
-    //     account_connected: false,
-    //     selected_language: "en"
-    // });
-    // await chat.save();
 
-    // const buttonText = "How can we help you today? Let's get started!🚀👇"
+    if (!chat) {
+        chat = new TelegramBot({
+            recipient: chatId,
+            last_message_time: currentTime,
+            last_message: "connect",
+            account_connected: false,
+        });
+    } else {
+        chat.last_message = callback_query || text_message || chat.last_message;
+        chat.last_message_time = currentTime;
+    }
+    await chat.save();
+
+    // const buttonText = "How can we help you today? Let's get started!🚀👇";
     // const message = `Hi ${data?.message?.chat?.first_name || data?.callback_query?.message?.chat?.first_name}! 🎉 Welcome to the InstaPay Telegram channel! 💬`;
     // const buttons = [
-    //     [{ text: lang[selectedLanguage].CONNECT_BUTTON_TITLE, callback_data: "connect_account" }],
-    //     [{ text: lang[selectedLanguage].REGISTER_BUTTON_TITLE, callback_data: "register" }],
-    //     [{ text: lang[selectedLanguage].CHANGE_LANGUAGE, callback_data: "language_change" }],
+    //     [{ text: "QR_Code", callback_data: "qr_code" }],
+    //     [{ text: "Change Language", callback_data: "register" }],
+    //     [{ text: "Connect Account", callback_data: "language_change" }],
     // ];
     // await sendPhoto(chatId, "https://nodejs-checking-bucket.s3.amazonaws.com/telegram_bot_images/welcome1.png", message);
     // await sendButtons(chatId, buttonText, buttons);
-    // return
-    // }
-    if (text_message === "hello") {
-        console.log("text_mess_agya", text_message)
-        const photoBusiness = "https://www.everee.com/wp-content/uploads/2022/07/1489157_EmailBanner-NewOp2-600x300-300ppi_102822.png";
-        await sendPhoto(chatId, photoBusiness, "Hello, how may I help you?", {
-            inline_keyboard: [
-                [
-                    { text: "qr_code", callback_data: "connect" },
-                    { text: "Register Account", callback_data: "register" },
-                ],
-                [{ text: "Change Language", callback_data: "change_language" }],
-            ],
-        });
-    } else if ((text_message && chat?.last_message?.startsWith("qr_code")) || (callback_query?.startsWith("qr_code") && chat?.last_message?.startsWith("qr_code")) || (callback_query === "qr_code") || (chat?.last_message?.startsWith("qr_code") && (image_payloads.length > 0 || video_payloads.length > 0))) {
+    if (!callback_query) {
+        const buttonText = "How can we help you today? Let's get started!🚀👇";
+        const message = `Hi ${data?.message?.chat?.first_name || data?.callback_query?.message?.chat?.first_name}! 🎉 Welcome to the InstaPay Telegram channel! 💬`;
+        const buttons = [
+            [{ text: "QR_Code", callback_data: "qr_code" }],
+            [{ text: "Change Language", callback_data: "register" }],
+            [{ text: "Connect Account", callback_data: "language_change" }],
+        ];
+        await sendPhoto(chatId, "https://nodejs-checking-bucket.s3.amazonaws.com/telegram_bot_images/welcome1.png", message);
+        await sendButtons(chatId, buttonText, buttons);
+    }
+    // // flow is related to the qr code
+    if ((text_message && chat?.last_message?.startsWith("qr_code")) || (callback_query?.startsWith("qr_code") && chat?.last_message?.startsWith("qr_code")) || (callback_query === "qr_code") || (chat?.last_message?.startsWith("qr_code") && (image_payloads.length > 0 || video_payloads.length > 0))) {
         sendMessage(chatId, "Qr_code run")
     }
-    else {
-        await sendMessage(chatId, "something wrong")
-    }
-
-
-
-
-    // flow is related to the qr code
-
-
-
-    // OTP Related process
-    // if (callback_query === "send_code_via_sms") {
-    //     if (chat.last_message === "intl_transfer_card_payment-otp") {
-    //         await handleOTPGenerationTG(selectedLanguage, chat, "intl_transfer_card_payment-otp", chat.last_message, "Transaction OTP", true);
-    //     }
-    //     return
-    // }
-
-    // // handling the resending the OTP
-    // if (callback_query && callback_query.startsWith("resend_otp_")) {
-
-    //     const context = callback_query.replace("resend_otp_", "");
-
-    //     await handleOTPGenerationTG(selectedLanguage, chat, context, "", context === "confirm_verification" ? "Signup OTP Code" : "Transaction OTP", true);
-    //     return
-    // }
-
-    // // connection process
-    // if ((text_message && chat.last_message?.startsWith("connect")) || (callback_query?.startsWith("connect") && chat.last_message?.startsWith("connect"))) {
-    //     await telegramConnection(chatId, callback_query, chat, text_message, selectedLanguage, data)
-    //     return
-    // }
-
-    // // registeration process
-    // if ((text_message && chat.last_message?.startsWith("register")) || (callback_query?.startsWith("register") && (chat.last_message?.startsWith("register") || chat.last_message === "connect"))) {
-    //     await accountRegisteration(chatId, callback_query, chat, text_message, selectedLanguage, data)
-    //     return
-    // }
-
-    // // change language process
-    // if ((text_message && chat.last_message?.startsWith("language")) || callback_query?.startsWith("language")) {
-    //     await changeLanguage(chatId, callback_query, chat, text_message, selectedLanguage)
-    //     return
-    // }
-
-    // // initiate_payment process
-    // if ((text_message && chat.last_message?.startsWith("i_p"))|| (callback_query?.startsWith("initiate_payment"))|| (callback_query === "initiate_payment")) {
-    //     await initiatePayment(chatId, callback_query, chat, text_message, selectedLanguage, data)
-    //     return
-    // }
-
-    // // international payment process
-    // if ((text_message && chat.last_message?.startsWith("intl_transfer"))|| (callback_query?.startsWith("intl_transfer") && chat.last_message?.startsWith("intl_transfer")) || (callback_query === "intl_transfer")|| (chat.last_message?.startsWith("intl_transfer") && (image_payloads.length > 0 || video_payloads.length > 0))) {
-    //     await initiateIntlTransfer(chatId, callback_query, chat, text_message, selectedLanguage, data, image_payloads, video_payloads)
-    //     return
-    // }
-    // // w2w payment process
-    // if ((text_message && chat.last_message?.startsWith("intl_transfer"))|| (callback_query?.startsWith("intl_transfer") && chat.last_message?.startsWith("intl_transfer"))|| (callback_query === "intl_transfer") || (chat.last_message?.startsWith("intl_transfer") && (image_payloads.length > 0 || video_payloads.length > 0))) {
-    //     await initiateW2W(chatId, callback_query, chat, text_message, selectedLanguage, data, image_payloads, video_payloads)
-    //     return
-    // }
-
-    // // if there is a request to add a payment card
-    // if (callback_query === "add_payment_card") {
-    //     const backButton = quick_reply?.payload?.split("-")[1];
-
-    //     const message = lang[selectedLanguage].SECURITY_ADVISORY;
-    //     const buttons = [
-    //         [{ text: lang[selectedLanguage].LOGIN, url: "https://my.insta-pay.ch/auth/login" }],
-    //         [{ text: lang[selectedLanguage].MAIN_MENU_MESSAGE, callback_data: "main_menu" }],
-    //     ];
-
-    //     if (chat.last_message !== "4") {
-    //         buttons.push([{ text: lang[selectedLanguage].BACK_TITLE, callback_data: backButton || "main_menu" }]);
-    //     }
-
-    //     return await sendButtons(chatId, message, buttons);
-    // }
-
-    // // if there is any random text or button, then show main manu
-    // if ((text_message && !callback_query && chat.last_message === "4") || (callback_query === "main_menu")) {
-    //     return await mainMenuMessage(chatId, selectedLanguage)
-    // }
-
 };
+
