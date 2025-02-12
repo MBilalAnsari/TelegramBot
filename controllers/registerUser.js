@@ -1,14 +1,13 @@
 
-
-import { sendPhoto,sendMessage, sendButtons } from "../utils/messageHelper.js";
-
+import { sendPhoto, sendMessage, sendButtons } from "../utils/messageHelper.js";
 
 
-export async function registerUser(chatId,  payload, chat) {
-    console.log("we are in registerUSer foo")
+
+export async function registerUser(chatId, payload, chat) {
+    // console.log("we are in registerUSer foo")
     // console.log(currentStep, "currentStep")
-    console.log(payload, "payload aya kia")
-   
+    console.log(chat.last_message, "payload kia aya" )
+
     if (payload === "register_cancel" && chat.last_message?.startsWith("register")) {
         console.log("we are in register cancel")
         const buttonText = "Registration Cancelled";
@@ -19,14 +18,15 @@ export async function registerUser(chatId,  payload, chat) {
         ];
         await sendButtons(chatId, buttons, buttonText, "connect");
     }
-    else if (payload === "register_template" && chat.last_message?.startsWith("connect")) {
-        console.log("we are in register template") 
+    else if (payload === "register_template" && chat.last_message?.startsWith("connect")) { 
+        console.log("we are in register template")
         const buttons = [
             [{ text: "Connect Account", callback_data: "connect_account" }],
             [{ text: "Register", callback_data: "register" }],
             [{ text: "Change Language", callback_data: "language_change" }],
-        ];
-        await sendButtons(chatId, buttons,"How can we help you today? Let's get started!🚀👇",  "register000");
+        ]; 
+        await sendButtons(chatId, buttons, "How can we help you today? Let's get started!🚀👇", "register000");
+        
     }
     else if (payload === "register" && chat.last_message === "register") {
         console.log("we are in register")
@@ -38,22 +38,25 @@ export async function registerUser(chatId,  payload, chat) {
         ];
         await sendPhoto(chatId, "https://nodejs-checking-bucket.s3.amazonaws.com/telegram_bot_images/Select.png");
 
-        await sendButtons(chatId,buttons, buttonText,  "register_0");
-    } else if (payload === "register_acc_ind" && chat.last_message === "register_0") {
+        await sendButtons(chatId, buttons, buttonText, "register_0");
+    } 
+    else if (payload === "register_acc_ind" && chat.last_message === "register_0") {
         console.log("we are in register individual")
         const buttons = [
             [{ text: "Cancel Registration", callback_data: "register_cancel" }],
         ];
         await sendPhoto(chatId, "https://nodejs-checking-bucket.s3.amazonaws.com/telegram_bot_images/Individual.png");
         await sendMessage(chatId, "Please enter your first name:", buttons, "register_1");
-    } else if (payload === "register_acc_bus" && chat.last_message === "register_1") {
+    } 
+    else if (payload === "register_acc_bus" && chat.last_message === "register_1") {
         console.log("we are in register business")
         const buttons = [
             [{ text: "Cancel Registration", callback_data: "register_cancel" }],
         ];
         await sendPhoto(chatId, "https://nodejs-checking-bucket.s3.amazonaws.com/telegram_bot_images/Business.png");
         await sendMessage(chatId, "Business account registration will come soon.", buttons, "register_2");
-    } else if (payload === "main_menu" || chat.last_message === "register_0") {
+    } 
+    else if (payload === "main_menu" || chat.last_message === "register_0") {
         console.log("Going to main menu");
         const message = "Welcome back! Need to make a transaction? Select from the options below🚀👇";
         const buttons = [
@@ -66,8 +69,9 @@ export async function registerUser(chatId,  payload, chat) {
             [{ text: "🌍 Change Language", callback_data: "language_change" }],
             [{ text: "💬 Chat with us", callback_data: "chat_with_us" }],
         ];
-        await sendButtons(chatId, buttons, message,"wallets_0");
-    } else if (payload === "wallet_overview" && chat.last_message === "wallets_0") {
+        await sendButtons(chatId, buttons, message, "wallets_0");
+    } 
+    else if (payload === "wallet_overview" && chat.last_message === "wallets_0") {
         console.log("we are in wallet overview");
         const message = "Wallet Currency: USD\nAvailable Balance: $1000\nYour wallet is your financial hub. Manage funds, make transactions, and keep track of your balance all in one place.";
         const buttons = [
@@ -75,11 +79,18 @@ export async function registerUser(chatId,  payload, chat) {
             [{ text: "💸 Convert Funds", callback_data: "convert_funds" }],
             [{ text: "💰 Add Currency", callback_data: "add_currency" }],
             [{ text: "🏠 Main Menu", callback_data: "main_menu" }],
-        ] 
+        ]
         // await sendButtons(chatId, buttons, message, "wallet_overview"); 
-}
-
-
-
-
-}
+    } 
+    else if ((chat.last_message?.startsWith("qr_quickpay"))||(callback_query?.startsWith("qr_quickpay"))|| (callback_query === "qr_quickpay")) {
+        console.log("we are in Qr QuickPay");
+        const message = "Scan, Pay and Go with Ease Embrance QR code wallet Evolution";
+        const buttons = [
+            [{ text: "Alphanumeric Code", callback_data: "add_funds" }],
+            [{ text: "Scan Qr Code", callback_data: "convert_funds" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ]
+        await sendPhoto(chatId, "https://miro.medium.com/v2/resize:fit:828/format:webp/1*7cmKvNClOo6K2cHSXsbW3w.png")
+        await sendButtons(chatId, buttons, message, "Qr_quickpay"); 
+    }
+}   

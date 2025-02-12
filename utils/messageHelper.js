@@ -46,7 +46,7 @@ export const sendPhoto = async (chatId, photoUrl, caption, options) => {
 };
 
 export const updateLastMessage = async (chatId, lastMessage) => {
-    console.log("Updating last message:", lastMessage);
+    // console.log("Updating last message:", lastMessage);
     try {
         const telegramBot = await TelegramBot.findOneAndUpdate(
             { recipient: chatId }, // Find by chatId
@@ -61,7 +61,7 @@ export const updateLastMessage = async (chatId, lastMessage) => {
 };
 
  export async function sendButtons(chatId, Buttons,text, lastMessage) {
-    console.log("we are in sendButtons")
+    // console.log("we are in sendButtons" , lastMessage)
     try {
         const response = await axios.post(`${teleGramAPI}/sendMessage`, {
             chat_id: chatId,
