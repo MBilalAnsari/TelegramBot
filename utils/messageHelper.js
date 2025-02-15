@@ -17,7 +17,7 @@ export const sendMessage = async (chatId, text, lastMessage) => {
 
     try {
         const response = await axios.post(`${teleGramAPI}/sendMessage`, payload);
-        console.log("Message sent successfully:", response.data);
+        // console.log("Message sent successfully:", response.data);
 
         // Agar userFlow diya gaya hai, to next step ko update karo
         if (lastMessage) {
@@ -54,7 +54,7 @@ export const updateLastMessage = async (chatId, lastMessage) => {
             // { upsert: true, new: true } // Create if not exists (upsert)
         );
 
-        console.log("Updated document:", telegramBot);
+        // console.log("Updated document:", telegramBot);
     } catch (error) {
         console.error("Error updating last message:", error.response?.data || error.message);
     }
