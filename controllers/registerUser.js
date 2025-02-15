@@ -1,10 +1,10 @@
 
+// import { text } from "body-parser";
 import { sendPhoto, sendMessage, sendButtons } from "../utils/messageHelper.js";
-export async function registerUser(chatId, payload, chat) {
-    // console.log("we are in registerUSer foo")
-    // console.log(currentStep, "currentStep")
-    console.log(chat.last_message, "payload kia aya")
-    // Agar user "Register" button click karta hai
+export async function registerUser(chatId, payload, chat ,  text_message) {
+    console.log("text_message in registerUser", text_message)
+    // const text_message = data.message.text;
+    // console.log("we are checking text", text)
     if (payload === "register_cancel" && chat.last_message?.startsWith("register")) {
         console.log("we are in register cancel")
         const buttonText = "Registration Cancelled";
@@ -71,20 +71,20 @@ export async function registerUser(chatId, payload, chat) {
             [{ text: "🌍 Change Language", callback_data: "language_change" }],
             [{ text: "💬 Chat with us", callback_data: "chat_with_us" }],
         ];
-        await sendButtons(chatId, buttons, message, "wallets_0");
+        await sendButtons(chatId, buttons, message, "Opt_all");
     }
     // wallet overview ka flow
-    else if (payload === "wallet_overview" && chat.last_message === "wallets_0") {
-        console.log("we are in wallet overview");
-        const message = "Wallet Currency: USD\nAvailable Balance: $1000\nYour wallet is your financial hub. Manage funds, make transactions, and keep track of your balance all in one place.";
-        const buttons = [
-            [{ text: "💳 Add Funds", callback_data: "add_funds" }]
-            [{ text: "💸 Convert Funds", callback_data: "convert_funds" }],
-            [{ text: "💰 Add Currency", callback_data: "add_currency" }],
-            [{ text: "🏠 Main Menu", callback_data: "main_menu" }],
-        ]
-        // await sendButtons(chatId, buttons, message, "wallet_overview"); 
-    }
+    // else if (payload === "wallet_overview" && chat.last_message === "wallets_0") {
+    //     console.log("we are in wallet overview");
+    //     const message = "Wallet Currency: USD\nAvailable Balance: $1000\nYour wallet is your financial hub. Manage funds, make transactions, and keep track of your balance all in one place.";
+    //     const buttons = [
+    //         [{ text: "💳 Add Funds", callback_data: "add_funds" }]
+    //         [{ text: "💸 Convert Funds", callback_data: "convert_funds" }],
+    //         [{ text: "💰 Add Currency", callback_data: "add_currency" }],
+    //         [{ text: "🏠 Main Menu", callback_data: "main_menu" }],
+    //     ]
+    //     // await sendButtons(chatId, buttons, message, "wallet_overview"); 
+    // }
     // QR QuickPay ka flow
     else if ((chat.last_message?.startsWith("qr_quickpay")) || (payload?.startsWith("qr_quickpay")) || (payload === "qr_quickpay")) {
         console.log("we are in Qr QuickPay");
@@ -97,7 +97,7 @@ export async function registerUser(chatId, payload, chat) {
         await sendPhoto(chatId, "https://miro.medium.com/v2/resize:fit:828/format:webp/1*7cmKvNClOo6K2cHSXsbW3w.png")
         await sendButtons(chatId, buttons, message, "qr_quickpay");
     }
-    // my qr code ka flow
+    // my qr code ka flow 
     else if ((chat.last_message?.startsWith("my_qr_code")) || (payload?.startsWith("my_qr_code")) || (payload === "my_qr_code")) {
         console.log("we are in connect account");
         const message = "Select the Wallet currencey to be credited";
@@ -136,6 +136,24 @@ export async function registerUser(chatId, payload, chat) {
         const message = "Please enter the alphanumeric wallet code";
         await sendMessage(chatId, message, "alpha_num_code");
     }
+    // when alphanumeric code will appear
+    // else if ((chat.last_message === "alpha_num_code") || (chat.last_message?.startsWith("alpha_num_code") && text_message === "4WOHZT9V")) {
+    //     console.log("we are in alphanum_wallet_code");
+    //     const message = `Username: Mohammad Yaseen\n` + 
+    //         `Country: Pakistan\n` +
+    //         `Wallet Name: 4WOHZT9V\n` +
+    //         `Wallet Currency: PKR`;
+    //     await sendMessage(chatId, message, "alphanum_wallet_code");
+    // }
+
+        // if ((chat.last_message === "4WOHZT9V") || (chat.last_message?.startsWith("alpha_num_code") && text_message === "4WOHZT9V")) {
+        // console.log("we are in alphanum_wallet_code");
+        // const message = `Username: Mohammad Yaseen\n` +
+        //     `Country: Pakistan\n` +
+        //     `Wallet Name: 4WOHZT9V\n` +
+        //     `Wallet Currency: PKR`;
+        // await sendMessage(chatId, message, "alphanum_wallet_code");
+    // }   
     // scan qr code ka flow
     else if ((chat.last_message?.startsWith("scan_qr_code")) || (payload?.startsWith("scan_qr_code")) || (payload === "scan_qr_code")) {
         console.log("we are in alpha_num_code");
@@ -167,6 +185,6 @@ export async function registerUser(chatId, payload, chat) {
         const buttons = [
             [{ text: "Main Menu", callback_data: "main_menu" }]
         ]
-        await sendButtons(chatId,buttons,  message, "e_sim");
+        await sendButtons(chatId, buttons, message, "e_sim");
     }
-}  
+}    

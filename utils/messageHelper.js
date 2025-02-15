@@ -70,7 +70,7 @@ export const updateLastMessage = async (chatId, lastMessage) => {
                 inline_keyboard: Buttons,
             },
         });
-        console.log('Buttons sent:', response.data);
+        // console.log('Buttons sent:', response.data);
         if (lastMessage) {
             await updateLastMessage(chatId, lastMessage);
         }

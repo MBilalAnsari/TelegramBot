@@ -9,7 +9,7 @@ dotenv.config()
 const app = express();
 
 app.use(bodyParser.json());
-// app.use(express.json()); // Better than bodyParser.json()
+app.use(express.json()); // Better than bodyParser.json()
 
 
 app.use("/", botRoutes);
