@@ -132,11 +132,11 @@ export async function registerUser(chatId, payload, chat ,  text_message) {
         await sendMessage(chatId, message, "alpha_num_code");
     } 
     // scan qr code ka flow
-    else if ((chat.last_message?.startsWith("scan_qr_code")) || (payload?.startsWith("scan_qr_code")) || (payload === "scan_qr_code")) {
-        console.log("we are in scan_qr_code");
-        const message = "Please submit your merchant's QR Code Image from your gallery";
-        await sendMessage(chatId, message, "scan_qr_code");
-    }
+    // else if ((chat.last_message?.startsWith("scan_qr_code")) || (payload?.startsWith("scan_qr_code")) || (payload === "scan_qr_code")) {
+    //     console.log("we are in scan_qr_code");
+    //     const message = "Please submit your merchant's QR Code Image from your gallery";
+    //     await sendMessage(chatId, message, "scan_qr_code");
+    // }
 
 
 

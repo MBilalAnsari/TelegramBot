@@ -15,18 +15,65 @@ export const handleUpdates = async (req, res) => {
 
     let text_message = null;
     let callback_query = null;
+    let edited_message = null;
+    let image_payloads = [];
+    let video_payloads = [];
 
-    if (data.message) {
-        text_message = data.message.text || null;
-        chatId = data.message.chat.id.toString();
-    } else if (data.callback_query) {
-        callback_query = data.callback_query.data;
-        chatId = data.callback_query.message.chat.id.toString();
-        // text_message = data.callback_query.message.text || null;
-        // console.log("Callback Query received:", callback_query);
-    }
+    // if (data.message) {
+    //     text_message = data.message.text || null;
+    //     chatId = data.message.chat.id.toString();
+    // }
+    // if (data.message.photo) {
+    //     image_payloads = data.message.photo.map(photo => ({
+    //         file_id: photo.file_id,
+    //         caption: data.message.caption || null
+    //     }));
+    //     console.log('Image Payloads:', image_payloads);
+    // }
+    // if (data.message.video) {
+    //     video_payloads = [{
+    //         file_id: data.message.video.file_id,
+    //         caption: data.message.caption || null,
+    //         mime_type: data.message.video.mime_type
+    //     }];
+    //     console.log('Video Payloads:', video_payloads);
+    // }
+    // else if (data.callback_query) {
+    //     callback_query = data.callback_query.data;
+    //     chatId = data.callback_query.message.chat.id.toString();
+    //     // text_message = data.callback_query.message.text || null;
+    //     // console.log("Callback Query received:", callback_query);
+    // }
+
 
     //  Find chat data in MongoDB
+
+    if (data.message) {
+        if (data.message.text) {
+            text_message = data.message.text;
+            // console.log('Text Message:', text_message);
+        }
+        if (data.message.photo) { 
+            image_payloads = data.message.photo.map(photo => ({
+                file_id: photo.file_id,
+                caption: data.message.caption || null
+            }));
+            console.log('Image Payloads:', image_payloads);
+        }
+        if (data.message.video) {
+            video_payloads = [{
+                file_id: data.message.video.file_id,
+                caption: data.message.caption || null,
+                mime_type: data.message.video.mime_type
+            }];
+            // console.log('Video Payloads:', video_payloads);
+        }
+        chatId = data.message.chat.id.toString()
+    } else if (data.callback_query) {
+        callback_query = data.callback_query.data;
+        chatId = data.callback_query.message.chat.id.toString()
+        // console.log('Callback Query:', callback_query);
+    }
     let chat = await TelegramBot.findOne({ recipient: chatId });
 
     //  If last message is the same, avoid duplicate processing
@@ -251,19 +298,34 @@ export const handleUpdates = async (req, res) => {
     }
 
 
-    
+
 
 
     // QR QuickPay code ka flow
-    if ((chat.last_message?.startsWith("scan_qr_code")) || (callback_query?.startsWith("scan_qr_code")) || (callback_query === "scan_qr_code") ) {
+    if ((chat.last_message?.startsWith("scan_qr_code")) || (callback_query?.startsWith("scan_qr_code")) || (callback_query === "scan_qr_code")) {
         console.log("we are in scan_qr_code");
         const message = "Please submit your merchant's QR code image from your phone gallery.";
-        await sendPhoto(chatId, photoUrl, message, text_message);
+        await sendMessage(chatId, message, "scan_qr_code");
     }
-
-
-
-
+    if ((image_payloads.length > 0 || video_payloads.length > 0)) {
+        console.log("we are in data qr code")
+        const message =
+            "Hasan Ali\n" +
+            "Username: ihasanalyy\n" +
+            "Country: Pakistan\n" +
+            "Wallet ID: 5RMIOSO7\n" +
+            "Wallet Currency: PKR\n\n" +
+            "Proceed?";
+        const buttons = [
+            [{ text: "View Profile", callback_data: "view_profile" }],
+            // [{ text: "Scan Again", callback_data: "scan_qr" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+            [{ text: "Yes", callback_data: "yes" }, { text: "No", callback_data: "main_menu" }],
+            [{ text: "Scan Again", callback_data: "scan_qr_code" }, { text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        // Sending the message with buttons
+        await sendButtons(chatId, buttons, message, text_message);
+    }
 
     // explore more ka flow
     if ((chat.last_message?.startsWith("explore_more")) || (callback_query?.startsWith("explore_more")) || (callback_query === "explore_more")) {
@@ -359,16 +421,16 @@ export const handleUpdates = async (req, res) => {
         ];
         await sendButtons(chatId, buttons, message, text_message);
     }
-    // airtime ka flow
+    // airtime ka flow 
     if (text_message && chat.last_message?.startsWith("Air_time") || (callback_query?.startsWith("Air_time")) || (callback_query === "Air_time")) {
         console.log("we are in Air_time");
         const message = "Enter the talk time amount you want to send. 📱\n" +
             "You can send between 98.15 and 24,538.97 PKR.";
-        await  sendMessage(chatId, message, text_message);
+        await sendMessage(chatId, message, text_message);
     }
-    if(text_message && text_message === "1000") {
+    if (text_message && text_message === "1000") {
         console.log("we are in Air_time");
-        const message =  "Insufficient Balance! Please topup your wallet.";
+        const message = "Insufficient Balance! Please topup your wallet.";
         const buttons = [
             [{ text: "Add Funds", callback_data: "add_funds" }],
             [{ text: "Main Menu", callback_data: "main_menu" }],
