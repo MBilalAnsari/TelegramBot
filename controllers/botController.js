@@ -135,7 +135,6 @@ export const handleUpdates = async (req, res) => {
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
         sendButtons(chatId, buttons, message, text_message);
-
     }
     if (text_message && chat.last_message?.startsWith("yes") || callback_query?.startsWith("yes") && callback_query === "yes") {
         console.log("we are in alphanum_wallet_code");
@@ -218,7 +217,7 @@ export const handleUpdates = async (req, res) => {
         ];
         sendButtons(chatId, buttons, message, text_message);
     }
-    if (text_message && text_message === "101" || callback_query?.startsWith("pay_pal") && callback_query === "pay_pal") {
+    if (text_message && text_message === "101" || callback_query?.startsWith("101") && callback_query === "101   ") {
         console.log("we are in PayPal amount_code");
         const message = "Amount to send: 100.00 PKR\n\n" +
             "Fee: 2.25 PKR\n\n" +
@@ -249,7 +248,7 @@ export const handleUpdates = async (req, res) => {
     if ((chat.last_message?.startsWith("add_funds")) || (callback_query?.startsWith("add_funds")) || (callback_query === "add_funds")) {
         console.log("we are in add funds");
         const message = "Select your top-up channel:";
-        const buttons = [
+        const buttons = [ 
             [{ text: "PayPal", callback_data: "pay_pal_btn" }],
             [{ text: "Google Pay", callback_data: "google_pay" }],
             [{ text: "Apple Pay", callback_data: "apple_pay" }],
