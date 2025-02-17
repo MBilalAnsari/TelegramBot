@@ -85,7 +85,7 @@ export async function registerUser(chatId, payload, chat ,  text_message) {
         await sendPhoto(chatId, "https://miro.medium.com/v2/resize:fit:828/format:webp/1*7cmKvNClOo6K2cHSXsbW3w.png")
         await sendButtons(chatId, buttons, message, "qr_quickpay");
     }
-
+ 
 
 
 

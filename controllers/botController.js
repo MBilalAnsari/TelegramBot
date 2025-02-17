@@ -1,8 +1,6 @@
-// import { text } from "body-parser";
+
 import { TelegramBot, User } from "../models/User.js"; // Import User model
-// import { registerUserCallback } from './authController.js';
 import { sendPhoto, sendMessage, sendButtons } from "../utils/messageHelper.js";
-// import axios from 'axios';
 import { registerUser } from './registerUser.js';
 
 
@@ -53,7 +51,7 @@ export const handleUpdates = async (req, res) => {
             text_message = data.message.text;
             // console.log('Text Message:', text_message);
         }
-        if (data.message.photo) { 
+        if (data.message.photo) {
             image_payloads = data.message.photo.map(photo => ({
                 file_id: photo.file_id,
                 caption: data.message.caption || null
@@ -193,7 +191,6 @@ export const handleUpdates = async (req, res) => {
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
         sendButtons(chatId, buttons, message, text_message);
-
     }
     if (text_message && chat.last_message?.startsWith("usd") || callback_query?.startsWith("usd") && callback_query === "usd") {
         console.log("we are in usd_wallet_code");
@@ -213,6 +210,18 @@ export const handleUpdates = async (req, res) => {
             "Insufficient Balance! Please topup your wallet.";
         const buttons = [
             [{ text: "Add Funds", callback_data: "add_funds" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && text_message === "10" || callback_query?.startsWith("usd") && callback_query === "usd") {
+        console.log("we are in amount_code");
+        const message = "Amount to send: 10 PKR\n" +
+            "Fee: 0.10 PKR\n" +
+            "Total amount: 10.10 PKR";
+        const buttons = [
+            [{ text: "Yes, Continue", callback_data: "proceed_transfer" }],
+            [{ text: "Cancel", callback_data: "cancel_proceed" }],
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
         sendButtons(chatId, buttons, message, text_message);
@@ -245,10 +254,30 @@ export const handleUpdates = async (req, res) => {
         await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
         await sendButtons(chatId, buttons, message, text_message);
     }
+    if (text_message && text_message === "225566" || chat.last_message?.startsWith("225566") || callback_query === "its_otp") {
+        console.log("we are in otp_code");
+        const message = "You have successfully sent 10 PKR to Muhammad Yaseen!"
+        const buttons = [
+            [{ text: "Scan QR Code", callback_data: "scan_qr_code" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && text_message === "225588" || chat.last_message?.startsWith("225588  ") || callback_query === "its_otp") {
+        console.log("we are in otp_code");
+        const message = "You have successfully sent 10 PKR to Hasan Ali!"
+        const buttons = [
+            // [{ text: "Scan QR Code", callback_data: "scan_qr_code" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
+        await sendButtons(chatId, buttons, message, text_message);
+    }
     if ((chat.last_message?.startsWith("add_funds")) || (callback_query?.startsWith("add_funds")) || (callback_query === "add_funds")) {
         console.log("we are in add funds");
         const message = "Select your top-up channel:";
-        const buttons = [ 
+        const buttons = [
             [{ text: "PayPal", callback_data: "pay_pal_btn" }],
             [{ text: "Google Pay", callback_data: "google_pay" }],
             [{ text: "Apple Pay", callback_data: "apple_pay" }],
@@ -382,9 +411,20 @@ export const handleUpdates = async (req, res) => {
         await sendButtons(chatId, buttons, message, text_message);
     }
     // pkr wallet ka flow
-    if (text_message && chat.last_message?.startsWith("PKR_Wallet") || (callback_query?.startsWith("USD_wallet")) || (callback_query === "PKR_Wallet")) {
+    if (text_message && chat.last_message?.startsWith("PKR_Wallet") || (callback_query?.startsWith("PKR_wallet")) || (callback_query === "PKR_Wallet")) {
         console.log("we are in PKR_Wallet");
-        const message = `You currently have 0.00 \n\nProceed or choose a different wallet.`;
+        const message = `You currently have 89.00\n\nProceed or choose a different wallet.`;
+        const buttons = [
+            [{ text: "Proceed", callback_data: "Proceed" }],
+            [{ text: "Another Wallet", callback_data: "InstaPay_wallet" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // Usd wallet ka flow
+    if (text_message && chat.last_message?.startsWith("USD_Wallet") || (callback_query?.startsWith("USD_wallet")) || (callback_query === "USD_Wallet")) {
+        console.log("we are in PKR_Wallet");
+        const message = `You currently have 100.00 USD`;
         const buttons = [
             [{ text: "Proceed", callback_data: "Proceed" }],
             [{ text: "Another Wallet", callback_data: "InstaPay_wallet" }],
@@ -424,9 +464,10 @@ export const handleUpdates = async (req, res) => {
     if (text_message && chat.last_message?.startsWith("Air_time") || (callback_query?.startsWith("Air_time")) || (callback_query === "Air_time")) {
         console.log("we are in Air_time");
         const message = "Enter the talk time amount you want to send. 📱\n" +
-            "You can send between 98.15 and 24,538.97 PKR.";
+            "You can send between 98.15 and 24,538.97.";
         await sendMessage(chatId, message, text_message);
     }
+    // airtime insufficent amount ka flow
     if (text_message && text_message === "1000") {
         console.log("we are in Air_time");
         const message = "Insufficient Balance! Please topup your wallet.";
@@ -434,6 +475,63 @@ export const handleUpdates = async (req, res) => {
             [{ text: "Add Funds", callback_data: "add_funds" }],
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // pkr airtime amount ka flow
+    if (text_message && text_message === "500") {
+        console.log("we are in Air_time");
+        const message = "Amount to send: 500 PKR\n" +
+            "Service: Airtime\n" +
+            "Recipent Gets: 459.00 PKR\n" +
+            "Country: Pakistan\n" +
+            "Operator: Zong Pakistan\n" +
+            "Phone: +923112047859"
+
+        const buttons = [
+            [{ text: "Confirm Purchase", callback_data: "proceed_transfer" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // Usd airtime amount ka flow
+    if (text_message && text_message === "1") {
+        console.log("we are in Air_time");
+        const message = "Review your airtime details:\n\n" +
+            "Total Cost: 0.95 USD\n" +
+            "Amount to send: 1.00 USD\n" +
+            "Service: Airtime\n\n" +
+            "Recipient Gets: 226.83 PKR\n\n" +
+            "Country: Pakistan\n" +
+            "Operator: Zong Pakistan\n" +
+            "Phone: +923112047859";
+
+        const buttons = [
+            [{ text: "Confirm Purchase", callback_data: "proceed_transfer" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && text_message === "225577" || chat.last_message?.startsWith("225577") || callback_query === "its_otp_airtime") {
+        console.log("we are in otp_code");
+        const message = "You have successfully charged +923112047859";
+        const buttons = [
+            [{ text: "New Transaction", callback_data: "mobile_airtime" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && text_message === "225599" || chat.last_message?.startsWith("225599") || callback_query === "its_otp_airtime") {
+        console.log("we are in otp_code");
+        const message = "You have successfully charged +923112047859\n" +
+            "Transaction ID: 1234567890\n" +
+            "Amount: 0.95 USD\n" +
+            "Recipent Gets: 225.1PKR"
+        const buttons = [
+            [{ text: "New Transaction", callback_data: "mobile_airtime" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
         await sendButtons(chatId, buttons, message, text_message);
     }
     // bundle ka flow 
@@ -530,5 +628,192 @@ export const handleUpdates = async (req, res) => {
         ]
         await sendButtons(chatId, buttons, message, "e_sim");
     }
+
+
+
+
+
+
+
+
+    // Initiate payment ka flow
+    if ((text_message && chat.last_message?.startsWith("initiate_payment")) || (callback_query?.startsWith("initiate_payment")) || (callback_query === "initiate_payment")) {
+        console.log("we are in initiate_payment");
+        const message = "How Can I serve you today?";
+        const buttons = [
+            [{ text: "Send Money", callback_data: "send_money" }],
+            [{ text: "Request Money", callback_data: "request_money" }],
+            [{ text: "Send a Quote", callback_data: "send_a_quote" }],
+            [{ text: "Send Crypto", callback_data: "send_crypto" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // Send a Quote ka flow
+    if ((text_message && chat.last_message?.startsWith("send_a_quote")) || (callback_query?.startsWith("send_a_quote")) || (callback_query === "send_a_quote")) {
+        console.log("We are in send_a_quote");
+
+        const message = "Ready to send a quote? Let's get the details right to ensure a smooth transaction.";
+
+        const buttons = [
+            [{ text: "Create Quote", callback_data: "create_quote" }]
+        ];
+
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // Create Quote ka flow
+    if ((text_message && chat.last_message?.startsWith("create_quote")) || (callback_query?.startsWith("create_quote")) || (callback_query === "create_quote")) {
+        console.log("We are in create_quote");
+
+        const message = "Who will receive your quote today? Please enter their InstaPay/Instagram username, mobile number, or email, or choose from your frequently contacted list.\n\n" +
+            "Please follow these examples:\n\n" +
+            "👤 InstaPay/Instagram Username: instauser\n" +
+            "📧 Email: user@email.com\n" +
+            "📞 Phone Number: 44795396600 (With Country Code)";
+
+        const buttons = [
+            [{ text: "Invite Someone", callback_data: "invite_someone" }]
+        ];
+
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // Invite Someone ka flow
+    if ((text_message && chat.last_message?.startsWith("invite_someone")) || (callback_query?.startsWith("invite_someone")) || (callback_query === "invite_someone")) {
+        console.log("We are in invite_someone");
+
+        const message = "How would you like to invite?\n\nBy: 👇";
+
+        const buttons = [
+            [{ text: "📞 Phone Number", callback_data: "invite_by_phone" }],
+            [{ text: "📧 Email", callback_data: "invite_by_email" }]
+        ];
+
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if ((text_message && chat.last_message?.startsWith("alara07")) || (callback_query?.startsWith("alara07")) || (callback_query === "alara07")) {
+        console.log("We are in invite_someone");
+        const message = "Alara ALi\n" +
+            "Username: alara07\n" +
+            "Country: Pakistan\n" +
+            "Or Select option below"
+        const buttons = [
+            [{ text: "Continue", callback_data: "continue" }],
+            [{ text: "View Profile", callback_data: "view_profile" }],
+            [{ text: "Select Different User", callback_data: "select_different_user" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // continue ka flow
+    if ((text_message && chat.last_message?.startsWith("continue")) || (callback_query?.startsWith("continue")) || (callback_query === "continue")) {
+        console.log("We are in continue");
+        const message = "Select the currency wallet for receiving the payment:";
+        const buttons = [
+            [{ text: "USD", callback_data: "send_qoute" }],
+            [{ text: "PKR", callback_data: "send_qoute" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // send qoute ka flow
+    if ((text_message && chat.last_message?.startsWith("send_qoute")) || (callback_query?.startsWith("send_qoute")) || (callback_query === "send_qoute")) {
+        console.log("We are in send_qoute");
+        const message = "Please enter the amount of your qoute.";
+        await sendMessage(chatId, message, text_message);
+    }
+    // qoute ka req
+    if ((text_message && chat.last_message?.startsWith("5")) || (callback_query?.startsWith("100")) || (callback_query === "100")) {
+        console.log("We are in qoute");
+        const message = "Add the title of your qoute.";
+        await sendMessage(chatId, message, text_message);
+    }
+    // qoute title ka flow
+    if ((text_message && chat.last_message?.startsWith("testing")) || (callback_query?.startsWith("testing")) || (callback_query === "testing")) {
+        console.log("We are in qoute title");
+        const message = "Would you like to add more details to this transaction?"
+        const buttons = [
+            [{ text: "Add a Note", callback_data: "add_note" }],
+            [{ text: "Attach a Document", callback_data: "attach_document" }],
+            [{ text: "Skip", callback_data: "skip" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // skip ka flow
+    if ((text_message && chat.last_message?.startsWith("skip")) || (callback_query?.startsWith("skip")) || (callback_query === "skip")) {
+        console.log("We are in skip");
+        const message = "Would you like to allow bargaining on this quote? It gives the recipient a chance to negotiate the price.";
+        const buttons = [
+            [{ text: "Yes", callback_data: "yes_skip" }],
+            [{ text: "No", callback_data: "no_skip" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // yes skip ka flow
+    if ((text_message && chat.last_message?.startsWith("yes_skip")) || (callback_query?.startsWith("yes_skip")) || (callback_query === "yes_skip")) {
+        console.log("We are in yes skip");
+        const message = "You're initiating a quote request for 10.00 PKR to ihasanalyy."
+        const buttons = [
+            [{ text: "Send a Quote", callback_data: "proceed_transfer" }],
+            [{ text: "Edit Quote", callback_data: "edit_quote" }],
+            [{ text: "Cancel", callback_data: "cancel" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // qoute otp ka flow
+    if ((text_message && chat.last_message?.startsWith("222555")) || (callback_query?.startsWith("222555")) || (callback_query === "its_otp_qoute")) {
+        console.log("we are in otp_code");
+        const message = "You have successfully sent a quote to Alara ALi!\n" +
+            "Amount: 10.00 PKR\n" +
+            "Recipient: ihasanalyy\n" +
+            "Date: 2023-10-01\n" +
+            "Title: testing"
+        const buttons = [
+            [{ text: "View Profile", callback_data: "view_profile" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://as1.ftcdn.net/jpg/01/63/74/20/1000_F_163742074_xXiKIiQ75jdQDULESQql7Y1f5uS0XIMK.webp");
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+
+
+
+
+
+
+    // Invite by Phone Number ka flow
+    if ((text_message && chat.last_message?.startsWith("invite_by_phone")) || (callback_query?.startsWith("invite_by_phone")) || (callback_query === "invite_by_phone")) {
+        console.log("We are in invite_by_phone");
+
+        const message = "Input your phone number. Example: +923292432631";
+
+        await sendMessage(chatId, message, "invite_by_phone");
+    }
+    // Invite by Phone Number ka flow
+    if (text_message && text_message === "+923112047859") {
+        console.log("Valid phone number received");
+
+        const message = "Hey, I thought you might be interested in using InstaPay! Here's my invite link:\n" +
+            "https://my.insta-pay.ch/auth/signup/ibilalansari";
+
+        const buttons = [
+            [{ text: "Confirm Purchase", callback_data: "proceed_transfer" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+
+    // invite by Email ka flow
+    if ((text_message && chat.last_message?.startsWith("invite_by_email")) || (callback_query?.startsWith("invite_by_email")) || (callback_query === "invite_by_email")) {
+        console.log("We are in invite_by_email");
+
+        const message = "Input the email address you want to invite.";
+
+        await sendMessage(chatId, message, "invite_by_email");
+    }
+
     return res.sendStatus(200); // ✅ Respond with 200 OK to prevent Telegram retries
 };
