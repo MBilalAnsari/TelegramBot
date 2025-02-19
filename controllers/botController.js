@@ -1,4 +1,3 @@
-
 import { TelegramBot, User } from "../models/User.js"; // Import User model
 import { sendPhoto, sendMessage, sendButtons } from "../utils/messageHelper.js";
 import { registerUser } from './registerUser.js';
@@ -16,32 +15,6 @@ export const handleUpdates = async (req, res) => {
     let edited_message = null;
     let image_payloads = [];
     let video_payloads = [];
-
-    // if (data.message) {
-    //     text_message = data.message.text || null;
-    //     chatId = data.message.chat.id.toString();
-    // }
-    // if (data.message.photo) {
-    //     image_payloads = data.message.photo.map(photo => ({
-    //         file_id: photo.file_id,
-    //         caption: data.message.caption || null
-    //     }));
-    //     console.log('Image Payloads:', image_payloads);
-    // }
-    // if (data.message.video) {
-    //     video_payloads = [{
-    //         file_id: data.message.video.file_id,
-    //         caption: data.message.caption || null,
-    //         mime_type: data.message.video.mime_type
-    //     }];
-    //     console.log('Video Payloads:', video_payloads);
-    // }
-    // else if (data.callback_query) {
-    //     callback_query = data.callback_query.data;
-    //     chatId = data.callback_query.message.chat.id.toString();
-    //     // text_message = data.callback_query.message.text || null;
-    //     // console.log("Callback Query received:", callback_query);
-    // }
 
 
     //  Find chat data in MongoDB
@@ -116,7 +89,143 @@ export const handleUpdates = async (req, res) => {
         console.log("text_message", text_message)
         await registerUser(chatId, callback_query, chat, text_message);
     }
+    // yahan se hassan ka code hai
+    // ye cond invite someone ke phone number per hai
+    else if (chat.text?.trim().startsWith("+923001234567") || chat.last_message?.trim().includes("+923001234567") || (chat.last_message === "+923001234567")) {
 
+        console.log("we are in phone number received");
+        const message = `Hey, I thought you might be interested in using InstaPay! Here's my invite link.\n\n invitation_link_here`;
+        const buttons = [
+            [{ text: "Send Invitation", callback_data: "send_invitation" }],
+            [{ text: "Personalize Message", callback_data: "personalize_message" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0")
+    }
+    // ye cond invite someone ke email per hai
+    else if (chat.last_message?.startsWith("abc@gmail.com") && chat.last_message?.includes("abc@gmail.com")) {
+
+        console.log("we are in email received");
+        const message = `Hey, I thought you might be interested in using InstaPay! Here's my invite link.\n\n invitation_link_here`;
+        const buttons = [
+            [{ text: "Send Invitation", callback_data: "send_invitation" }],
+            [{ text: "Personalize Message", callback_data: "personalize_message" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0")
+    }
+    // ye cond invite someone ke personalize message per hai
+    else if ((chat.last_message?.startsWith("Hello") && chat.last_message?.includes("Hello")) || (chat.last_message === "Hello")) {
+        
+        console.log("we are in personalize message received");
+        const message = `Your personalizeed message preview👇\n\n ${chat.last_message}\n\n my.insta-pay.ch/auth/signup/ihasanalyy`;
+        const buttons = [
+            [{ text: "Edit", callback_data: "personalize_message" }],
+            [{ text: "Send invitation", callback_data: "send_invitation" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0")
+    }
+    else if (chat.last_message?.startsWith("ibilalansari") && chat.last_message?.includes("ibilalansari") || (chat.last_message === "ibilalansari") || (chat.last_message === "ibilalansari@gmail.com") || (chat.last_message === "+92123456789")) {
+
+        console.log("we are in email received");
+        const message = `(profile URL) M Bilal Ansari\n Username: ibilalansari\n Country: Pakistan`;
+        const buttons = [
+            [{ text: "Continue", callback_data: "new_continue_with_user" }],
+            [{ text: "View profile", callback_data: "view_profile" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0")
+        const messageOption = `Or select preferred option below`;
+        const buttonsOption = [
+            [{ text: "Choose another", callback_data: "request_money" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttonsOption, messageOption, "register_0")
+    }
+    else if ((chat.last_message?.startsWith("150") || chat.last_message?.includes("150")) && chat.last_message >= 150) {
+        console.log("we are in currency send money");
+        const message = "Completing this transaction will exceed your balance limit of 13,505.30 PKR. Please enter an amount within your balance limit or complete KYC verification to increase your balance limit.";
+        const buttons = [
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+            [{ text: "Identity Verification", callback_data: "identity_verification" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0");
+    }
+    else if ((chat.last_message?.startsWith("20") || chat.last_message?.includes("20")) && chat.last_message < 150 ) {
+        console.log("we are in currency send money");
+        const message = "What's your transaction today? Choose the type of payment request that works for you:";
+       
+        await sendMessage(chatId, message, "register_0");
+       const message1 = "Simple, immediate, and secure daily transactions.";
+       const message2 = "Stop chasing payments,opt for automatic debiting!";
+       const message3 = "Receive your payments on time, no more waiting!";
+
+        const buttons1 = [
+            [{ text: "Instant", callback_data: "instant" }],
+            [{ text: "Back", callback_data: "request_money" }],
+        ];
+        const buttons2 = [
+            [{ text: "Subscription", callback_data: "subscription" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        const buttons3 = [
+            [{ text: "Schedule", callback_data: "schedule" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons1, message1, "register_0");
+        await sendButtons(chatId, buttons2, message2, "register_0");
+        await sendButtons(chatId, buttons3, message3, "register_0");
+    }
+    else if (chat.last_message?.startsWith("test")  || chat.last_message?.includes("test") || chat.last_message === "test") {
+        console.log("we are in test");
+        const message = "Would you like to attach a document? It can add more context to your transaction. Supported formats: JPEG, PNG, MP4. You can attach up to 5 files in total, including one video file.";
+        const buttons = [
+            [{ text: "Yes", callback_data: "yes_attach_a_document_req" }],
+            [{ text: "No", callback_data: "dir_skipped" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0")
+    }
+    // ye condition single pic anay per chalegi db se handle hogi
+    // else if ((image_payloads.length > 0)) {
+    //     console.log("we are in iniating request");
+    //     const message = "You're initiating a request for 10.00 PKR to M Bilal Ansari\n\nProceed?";
+    //     const buttons = [
+    //         [{ text: "Confirm", callback_data: "confirm" }],
+    //         [{ text: "Main Menu", callback_data: "main_menu" }],
+    //     ];
+    //     await sendButtons(chatId, buttons, message, "register_0")
+    // }
+    // ye condtion multiple pics anay se chalegi db se handle hogi
+    // else if ((image_payloads.length > 0)) {
+    //     console.log("we are in instant payment");
+    //     const message = "Do you wish to attach a note to this payment request?";
+    //     const buttons = [
+    //         [{ text: "Yes", callback_data: "add_a_note" }],
+    //         [{ text: "No", callback_data: "dir_skipped" }],
+    //     ];
+    //     await sendButtons(chatId, buttons, message, "register_0");
+    // }
+    else if ((chat.last_message?.startsWith("hi") && chat.last_message?.includes("hi")) || (chat.last_message === "hi")) {
+        console.log("we are in skip");
+        const message = "You're initiating a request for 10.00 PKR to M Bilal Ansari\n\nProceed?";
+        const buttons = [
+            [{ text: "Confirm", callback_data: "confirm" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0")
+    }
+// OTP logic static
+    else if (chat.last_message?.startsWith("123456") || chat.last_message?.includes("123456") || (chat.last_message === "123456")) {
+        console.log("we are in OTP received");
+        const message = "You have accepted the payment request.\nTransaction ID: tr_123456789";
+        const buttons = [
+            [{ text: "Leave a comment", callback_data: "leave_a_comment" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, "register_0")
+    }
+
+    // yahan se bilal ka code hai
     // last message starts with 
     console.log("chat.last_message", chat.last_message);
     console.log("text_message", text_message);
@@ -274,18 +383,18 @@ export const handleUpdates = async (req, res) => {
         await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
         await sendButtons(chatId, buttons, message, text_message);
     }
-    if ((chat.last_message?.startsWith("add_funds")) || (callback_query?.startsWith("add_funds")) || (callback_query === "add_funds")) {
-        console.log("we are in add funds");
-        const message = "Select your top-up channel:";
-        const buttons = [
-            [{ text: "PayPal", callback_data: "pay_pal_btn" }],
-            [{ text: "Google Pay", callback_data: "google_pay" }],
-            [{ text: "Apple Pay", callback_data: "apple_pay" }],
-            [{ text: "Other payment method", callback_data: "other_payment_method" }],
-            [{ text: "Main Menu", callback_data: "main_menu" }],
-        ];
-        await sendButtons(chatId, buttons, message, text_message);
-    }
+    // if ((chat.last_message?.startsWith("add_funds")) || (callback_query?.startsWith("add_funds")) || (callback_query === "add_funds")) {
+    //     console.log("we are in add funds");
+    //     const message = "Select your top-up channel:";
+    //     const buttons = [
+    //         [{ text: "PayPal", callback_data: "pay_pal_btn" }],
+    //         [{ text: "Google Pay", callback_data: "google_pay" }],
+    //         [{ text: "Apple Pay", callback_data: "apple_pay" }],
+    //         [{ text: "Other payment method", callback_data: "other_payment_method" }],
+    //         [{ text: "Main Menu", callback_data: "main_menu" }],
+    //     ];
+    //     await sendButtons(chatId, buttons, message, text_message);
+    // }
     if ((chat.last_message?.startsWith("pay_pal_btn")) || (callback_query?.startsWith("pay_pal_btn")) || (callback_query === "pay_pal_btn")) {
         console.log("we are in paypal");
         const message = "This payout channel is not available at the moment.";
@@ -672,11 +781,12 @@ export const handleUpdates = async (req, res) => {
             [{ text: "Send Money", callback_data: "send_money" }],
             [{ text: "Request Money", callback_data: "request_money" }],
             [{ text: "Send a Quote", callback_data: "send_a_quote" }],
-            [{ text: "Send Crypto", callback_data: "send_crypto" }],
+            [{ text: "Send Crypto", callback_data: "send_crypto" }]
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
         await sendButtons(chatId, buttons, message, text_message);
     }
+
     // Send a Quote ka flow
     if ((text_message && chat.last_message?.startsWith("send_a_quote")) || (callback_query?.startsWith("send_a_quote")) || (callback_query === "send_a_quote")) {
         console.log("We are in send_a_quote");
@@ -707,18 +817,18 @@ export const handleUpdates = async (req, res) => {
         await sendButtons(chatId, buttons, message, text_message);
     }
     // Invite Someone ka flow
-    if ((text_message && chat.last_message?.startsWith("invite_someone")) || (callback_query?.startsWith("invite_someone")) || (callback_query === "invite_someone")) {
-        console.log("We are in invite_someone");
+    // if ((text_message && chat.last_message?.startsWith("invite_someone")) || (callback_query?.startsWith("invite_someone")) || (callback_query === "invite_someone")) {
+    //     console.log("We are in invite_someone");
 
-        const message = "How would you like to invite?\n\nBy: 👇";
+    //     const message = "How would you like to invite?\n\nBy: 👇";
 
-        const buttons = [
-            [{ text: "📞 Phone Number", callback_data: "invite_by_phone" }],
-            [{ text: "📧 Email", callback_data: "invite_by_email" }]
-        ];
+    //     const buttons = [
+    //         [{ text: "📞 Phone Number", callback_data: "invite_by_phone" }],
+    //         [{ text: "📧 Email", callback_data: "invite_by_email" }]
+    //     ];
 
-        await sendButtons(chatId, buttons, message, text_message);
-    }
+    //     await sendButtons(chatId, buttons, message, text_message);
+    // }
     if ((text_message && chat.last_message?.startsWith("alara07")) || (callback_query?.startsWith("alara07")) || (callback_query === "alara07")) {
         console.log("We are in invite_someone");
         const message = "Alara ALi\n" +
@@ -757,7 +867,7 @@ export const handleUpdates = async (req, res) => {
         await sendMessage(chatId, message, text_message);
     }
     // qoute title ka flow
-    if ((text_message && chat.last_message?.startsWith("testing")) || (callback_query?.startsWith("testing")) || (callback_query === "testing")) {
+    if ((text_message && chat.last_message?.startsWith("makequote")) || (callback_query?.startsWith("makequote")) || (callback_query === "makequote")) {
         console.log("We are in qoute title");
         const message = "Would you like to add more details to this transaction?"
         const buttons = [
@@ -874,7 +984,7 @@ export const handleUpdates = async (req, res) => {
             "Title: testing"
         const buttons = [
             [{ text: "Main Menu", callback_data: "main_menu" }],
-            [{ text: "Accept flow", callback_data: "accept_quote" }]
+            [{ text: "Accept flow", callback_data: "agree_Quote" }]
         ];
         await sendPhoto(chatId, "https://as1.ftcdn.net/jpg/01/63/74/20/1000_F_163742074_xXiKIiQ75jdQDULESQql7Y1f5uS0XIMK.webp");
         await sendButtons(chatId, buttons, message, text_message);
@@ -886,20 +996,39 @@ export const handleUpdates = async (req, res) => {
 
 
     //Accept Quote ka flow
-    if ((text_message && chat.last_message?.startsWith("accept_quote")) || (callback_query?.startsWith("accept_quote")) || (callback_query === "accept_quote")) {
-        console.log("We are in accept_quote");
+     //Accept Quote ka flow
+     if ((text_message && chat.last_message?.startsWith("agree_Quote")) || (callback_query?.startsWith("agree_Quote")) || (callback_query === "agree_Quote")) {
+        console.log("We are in agree_quote");
         const message = "You've received a new quote from alara07\n" +
             "Amount: 10.00 PKR\n" +
             "Country: Pakistan";
         const buttons = [
-            [{ text: "Accept Qoute", callback_data: "main_menu" }],
-            [{ text: "Decline", callback_data: "main_menu" }],
-            [{ text: "Negotiate", callback_data: "main_menu" }],
+            [{ text: "Accept Qoute", callback_data: "accept_qoute" }],
+            [{ text: "Decline", callback_data: "dec_qoute" }],
+            [{ text: "Negotiate", callback_data: "neg_qoute" }],
         ];
         await sendPhoto(chatId, "https://img.freepik.com/premium-photo/friends-women-with-smartphone-social-media-technology-with-students-campus-online-outdoor-connection-meme-post-with-happiness-communication-with-5g-network-gen-z-youth_590464-130948.jpg")
         await sendButtons(chatId, buttons, message, text_message);
     }
-    if ((text_message && chat.last_message?.startsWith("accept_quote")) || (callback_query?.startsWith("accept_quote")) || (callback_query === "accept_quote")) {
+    if (
+        text_message && text_message === "dec_qoute" || chat.last_message?.startsWith("dec_qoute ") || callback_query === "dec_qoute") {
+        console.log("we are in decline");
+
+        const message = `You've declined the quote from alara07.\n` +
+            `No payment will be processed.\n` +
+            `Quotation ID: qa_1739960958719\n` +
+            `Amount: 12.00 PKR\n` +
+            `Title: Test`;
+        const buttons = [
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://img.freepik.com/premium-photo/friends-women-with-smartphone-social-media-technology-with-students-campus-online-outdoor-connection-meme-post-with-happiness-communication-with-5g-network-gen-z-youth_590464-130948.jpg")
+
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+
+
+    if ((text_message && chat.last_message?.startsWith("agree_Quote")) || (callback_query?.startsWith("agree_Quote")) || (callback_query === "agree_Quote")) {
         console.log("We are in accept_quote");
         const message = "Click below to view details"
         const buttons = [
@@ -908,10 +1037,98 @@ export const handleUpdates = async (req, res) => {
         ];
         await sendButtons(chatId, buttons, message, text_message);
     }
+    if ((text_message && chat.last_message?.startsWith("view_details")) || (callback_query?.startsWith("view_details")) || (callback_query === "view_details")) {
+        console.log("We are in View details");
+        const message = `Quotation ID: qa_1739960958719\n` +
+            `Amount: 10.00 PKR\n` +
+            `Title: Test\n` +
+            `Description: undefined\n` +
+            `Bargain: Allowed`;
+        await sendMessage(chatId, message, text_message);
+    }
+    if ((text_message && chat.last_message?.startsWith("neg_qoute")) || (callback_query?.startsWith("neg_qoute")) || (callback_query === "neg_qoute")) {
+        console.log("We are in neg_qoute");
+        const message = `Enter your counter offer in PKR, and we'll send it back for approval.`;
+        await sendMessage(chatId, message, text_message);
+    }
+    if ((text_message && chat.last_message?.startsWith("12")) || (callback_query?.startsWith("12")) || (callback_query === "12")) {
+        console.log("We are in neg_qoute");
+        const message = `Please enter the code sent to your registered number or email.`;
+        await sendMessage(chatId, message, text_message);
+    }
+
+
+    if ((text_message && chat.last_message?.startsWith("222111")) || (callback_query?.startsWith("222111")) || (callback_query === "n_otp_qoute")) {
+        console.log("we are in otp_code");
+        const message =
+            `You have successfully submitted a counteroffer in PKR for the quote sent by alara07.\n` +
+
+            `Quotation ID: qa_1739960958719\n` +
+            `Bargaining amount: 12.00 PKR\n` +
+            `Title: Test\n` +
+            `Status: Negotiation in Progress`;
+        await sendMessage(chatId, message, text_message);
+    }
 
 
 
-
+    //Accept Quote ka flow
+    if ((text_message && text_message === "accept_qoute") || (callback_query?.startsWith("accept_qoute")) || (callback_query === "accept_qoute")) {
+        console.log("we are in accept-qoute")
+        const message = "Select the payment method you would like to pay with:"
+        const buttons = [
+            [{ text: "InstaPay wallet", callback_data: "Acc_Ins_wallet" }],
+            [{ text: "Paypal", callback_data: "Proceed" }],
+            [{ text: "Add Payment Card", callback_data: "Add_pay_card" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && chat.last_message?.startsWith("Acc_Ins_wallet") || callback_query?.startsWith("Acc_Ins_wallet") && callback_query === "Acc_Ins_wallet") {
+        console.log("we are in instapay_wallet_code");
+        const message = "Among the active currencies in your Wallet, select the one to be debited"
+        const buttons = [
+            [{ text: "PKR", callback_data: "Acc_pkr_wll" }],
+            [{ text: "USD", callback_data: "usd" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && chat.last_message?.startsWith("Acc_pkr_wll") || (callback_query?.startsWith("Acc_pkr_wll")) || (callback_query === "Acc_pkr_wll")) {
+        console.log("we are in PKR_Wallet");
+        const message = `You currently have 89.00\n\nProceed or choose a different wallet.`;
+        const buttons = [
+            [{ text: "Proceed", callback_data: "acc_pr" }],
+            [{ text: "Another Wallet", callback_data: "accept_qoute" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && chat.last_message?.startsWith("acc_pr") || (callback_query?.startsWith("acc_pr")) || (callback_query === "acc_pr")) {
+        console.log("we are in PKR_Wallet");
+        const message = `Amount to send: 5:00 PKR\n` +
+            `Recipient Gets: 5.00 PKR\n` +
+            `Total amount: 5.00 PKR`
+        const buttons = [
+            [{ text: "Yes, Continue", callback_data: "proceed_transfer" }],
+            [{ text: "Cancel", callback_data: "cancel_proceed" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if (text_message && text_message === "222666" || chat.last_message?.startsWith("222666") || callback_query === "Acc_q_otp") {
+        console.log("we are in otp_code");
+        const message = `You’ve accepted the quote. The payment will be processed per the agreed terms\n.` +
+            `Quotation ID: qa_17398689788169\n` +
+            `Amount: 5.00 PKR\n` +
+            `Username: alara07\n` +
+            `Title: Test`;
+        const buttons = [
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
+        await sendButtons(chatId, buttons, message, text_message);
+    }
 
 
 
@@ -929,12 +1146,50 @@ export const handleUpdates = async (req, res) => {
 
         const message = "Hey, I thought you might be interested in using InstaPay! Here's my invite link:\n" +
             "https://my.insta-pay.ch/auth/signup/ibilalansari";
-
         const buttons = [
-            [{ text: "Confirm Purchase", callback_data: "proceed_transfer" }],
+            [{ text: "Send Invitation", callback_data: "send_inv" }],
+            [{ text: "Personalize Message", callback_data: "personalized_mess" }],
             [{ text: "Main Menu", callback_data: "main_menu" }]
         ];
 
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // Send Personalize mess
+    if ((text_message && chat.last_message?.startsWith("personalized_mess")) || (callback_query?.startsWith("personalized_mess")) || (callback_query === "personalized_mess")) {
+        console.log("We are in personalized_mess");
+
+        const message = "Please type your personalized message for the invitee.";
+
+        await sendMessage(chatId, message, text_message);
+    }
+    // Edit Personalize Mess
+    if (text_message && text_message === "addedmess" || chat.last_message?.startsWith("addedmess") || callback_query === "addedmess") {
+        console.log("we are in send_inv");
+        const message = `Your personalized message preview 👇\n` +
+        `addedmess\n`+
+        `my.insta-pay.ch/auth/signup/ibilalansari`;
+        const buttons = [
+            [{ text: "Edit", callback_data: "personalized_mess" }],
+            [{ text: "Send Invitation", callback_data: "send_inv" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    
+    // Send inv 
+    if (text_message && text_message === "send_inv" || chat.last_message?.startsWith("send_inv") || callback_query === "send_inv") {
+        console.log("we are in send_inv");
+        const message = `Your invite to +923112047859 has been sent successfully!\n` +
+            `* Refer & Earn Money with the InstaPay Tiered Affiliation Program* \n` +
+            `Unlock endless rewards with our Tiered Affiliation Program! Earn commissions based on the activity of your followers on INSTAPAY.The more they transact, the more you earn.Dive into the lucrative world of INSTAPAY and turn influence into affluence.`;
+        const buttons = [
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+            [{ text: "Share Referral Link", callback_data: "share_referral_link" }],
+            [{ text: "Track My Earnings", callback_data: "track_my_earnings" }],
+            [{ text: "Learn More", callback_data: "learn_more" }],
+        ];
+        await sendPhoto(chatId, "https://images.peopleimages.com/picture/202306/2836772-png-shot-of-a-handsome-young-man-standing-alone-in-the-studio-with-his-finger-on-his-lips-fit_400_400.jpg");
         await sendButtons(chatId, buttons, message, text_message);
     }
 
