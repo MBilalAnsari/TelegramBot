@@ -15,7 +15,7 @@ app.use(express.json()); // Better than bodyParser.json()
 app.use("/", botRoutes);
 
 
-const PORT = process.env.PORT 
+const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
     connectDB()

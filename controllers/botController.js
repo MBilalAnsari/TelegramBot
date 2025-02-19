@@ -335,7 +335,7 @@ export const handleUpdates = async (req, res) => {
         const message = "Please submit your merchant's QR code image from your phone gallery.";
         await sendMessage(chatId, message, "scan_qr_code");
     }
-    if ((image_payloads.length > 0 || video_payloads.length > 0)) {
+    if ((image_payloads.length > 0)) {
         console.log("we are in data qr code")
         const message =
             "Hasan Ali\n" +
@@ -615,7 +615,35 @@ export const handleUpdates = async (req, res) => {
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
         await sendButtons(chatId, buttons, message, text_message);
+    } else if ((text_message && chat.last_message?.startsWith("assistan_required")) || (callback_query?.startsWith("assistan_required")) || (callback_query === "assistan_required")) {
+        console.log("We are in assistan_required");
+
+        const message = "Please let us know how we can assist you today.";
+
+        const buttons = [
+            [{ text: "Login Issues", callback_data: "assist_login_issues" }],
+            [{ text: "Transaction Query", callback_data: "assist_transaction_query" }],
+            [{ text: "Profile Setup Help", callback_data: "assist_profile_setup" }],
+            [{ text: "Other Issue", callback_data: "assist_other_issue" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+
+        await sendButtons(chatId, buttons, message, text_message);
     }
+    const assistButtons = ["assist_login_issues", "assist_transaction_query", "assist_profile_setup", "assist_other_issue"];
+
+    if ((text_message && assistButtons.includes(chat.last_message)) || (callback_query && assistButtons.includes(callback_query))) {
+        console.log("We are in assistance flow");
+
+        const message = "Once of our reprensentatives will get back to youshortly.";
+
+        const buttons = [
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+
 
 
 
@@ -656,7 +684,8 @@ export const handleUpdates = async (req, res) => {
         const message = "Ready to send a quote? Let's get the details right to ensure a smooth transaction.";
 
         const buttons = [
-            [{ text: "Create Quote", callback_data: "create_quote" }]
+            [{ text: "Create Quote", callback_data: "create_quote" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
 
         await sendButtons(chatId, buttons, message, text_message);
@@ -699,7 +728,7 @@ export const handleUpdates = async (req, res) => {
         const buttons = [
             [{ text: "Continue", callback_data: "continue" }],
             [{ text: "View Profile", callback_data: "view_profile" }],
-            [{ text: "Select Different User", callback_data: "select_different_user" }],
+            [{ text: "Select Different User", callback_data: "create_quote" }],
             [{ text: "Main Menu", callback_data: "main_menu" }]
         ];
         await sendButtons(chatId, buttons, message, text_message);
@@ -733,19 +762,76 @@ export const handleUpdates = async (req, res) => {
         const message = "Would you like to add more details to this transaction?"
         const buttons = [
             [{ text: "Add a Note", callback_data: "add_note" }],
-            [{ text: "Attach a Document", callback_data: "attach_document" }],
+            [{ text: "Attach a Document", callback_data: "doc_att" }],
             [{ text: "Skip", callback_data: "skip" }],
             [{ text: "Main Menu", callback_data: "main_menu" }]
         ];
         await sendButtons(chatId, buttons, message, text_message);
     }
+    // Add a Note 
+    if ((text_message && text_message === "add_note") || (callback_query?.startsWith("add_note")) || (callback_query === "add_note")) {
+        console.log("We are in add_note");
+        const message = "Please type your note below to additional details to your qoute.";
+        await sendMessage(chatId, message, text_message);
+    }
+    // After Add a note
+    if ((text_message && text_message === "addednote")) {
+        console.log("We are in addednote");
+        const message = "Would you like to attach a document? It can add more context to your transaction. Supported formats: JPEG, PNG, MP4. You can attach up to 5 files in total, including one video file."
+        const buttons = [
+            [{ text: "Yes", callback_data: "attach_document" }],
+            [{ text: "No", callback_data: "no_document" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // attach doc 01
+    if ((text_message && text_message === "doc_att") || (callback_query?.startsWith("doc_att")) || (callback_query === "doc_att")) {
+        console.log("We are in attach_document_01");
+        const message = "Please Attach yout Document";
+        const buttons = [
+            [{ text: "Back", callback_data: "testing" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // Attach a Document
+    if ((text_message && text_message === "attach_document") || (callback_query?.startsWith("attach_document")) || (callback_query === "attach_document")) {
+        console.log("We are in attach_document");
+        const message = "Please attach your document.";
+        await sendMessage(chatId, message, text_message);
+    }
+    // After Attach a Document
+    if (video_payloads.length > 0) {
+        console.log("We are in after_attach_document");
+        const message = "Would you like to allow bargaining on this quote? It gives the recipient a chance to negotiate the price.";
+        const buttons = [
+            [{ text: "Yes", callback_data: "yes_skip" }],
+            [{ text: "No", callback_data: "yes_skip" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    // No Document
+    if ((text_message && text_message === "no_document") || (callback_query?.startsWith("no_document")) || (callback_query === "no_document")) {
+        console.log("We are in no_document");
+        const message = "Would you like to allow bargaining on this quote? It gives the recipient a chance to negotiate the price."
+        const buttons = [
+            [{ text: "Yes", callback_data: "yes_skip" }],
+            [{ text: "No", callback_data: "no_skip" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ];
+        await sendButtons(chatId, buttons, message, text_message)
+    }
+
+
     // skip ka flow
     if ((text_message && chat.last_message?.startsWith("skip")) || (callback_query?.startsWith("skip")) || (callback_query === "skip")) {
         console.log("We are in skip");
         const message = "Would you like to allow bargaining on this quote? It gives the recipient a chance to negotiate the price.";
         const buttons = [
             [{ text: "Yes", callback_data: "yes_skip" }],
-            [{ text: "No", callback_data: "no_skip" }],
+            [{ text: "No", callback_data: "yes_skip" }],
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ];
         await sendButtons(chatId, buttons, message, text_message);
@@ -753,30 +839,76 @@ export const handleUpdates = async (req, res) => {
     // yes skip ka flow
     if ((text_message && chat.last_message?.startsWith("yes_skip")) || (callback_query?.startsWith("yes_skip")) || (callback_query === "yes_skip")) {
         console.log("We are in yes skip");
-        const message = "You're initiating a quote request for 10.00 PKR to ihasanalyy."
+        const message = "You're initiating a quote request for 10.00 PKR to ihasanalyy\n" +
+            "Proceed";
         const buttons = [
             [{ text: "Send a Quote", callback_data: "proceed_transfer" }],
-            [{ text: "Edit Quote", callback_data: "edit_quote" }],
-            [{ text: "Cancel", callback_data: "cancel" }],
+            [{ text: "Edit Quote", callback_data: "create_quote" }],
+            [{ text: "Cancel", callback_data: "cancel_qoute" }],
             [{ text: "Main Menu", callback_data: "main_menu" }]
         ];
         await sendButtons(chatId, buttons, message, text_message);
     }
+    // cancel qoute ka flow
+    if ((text_message && text_message === "cancel_qoute") || (callback_query?.startsWith("cancel_qoute")) || (callback_query === "cancel_qoute")) {
+        console.log("We are in cancel qoute");
+        const message = "Your transaction has been cancelled as per your request."
+        const buttons = [
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if ((text_message && chat.last_message?.startsWith("222555")) || (callback_query?.startsWith("222555")) || (callback_query === "its_otp_qoute")) {
+        console.log("We are in its otp qoute");
+        const message = "Creating your Qoutation"
+        await sendMessage(chatId, message, text_message)
+    }
     // qoute otp ka flow
     if ((text_message && chat.last_message?.startsWith("222555")) || (callback_query?.startsWith("222555")) || (callback_query === "its_otp_qoute")) {
         console.log("we are in otp_code");
-        const message = "You have successfully sent a quote to Alara ALi!\n" +
-            "Amount: 10.00 PKR\n" +
+        const message = "Your qoute has been sent!\n"
+        "Quotation ID:qa_1739868978196"
+        "Amount: 10.00 PKR\n" +
             "Recipient: ihasanalyy\n" +
             "Date: 2023-10-01\n" +
             "Title: testing"
         const buttons = [
-            [{ text: "View Profile", callback_data: "view_profile" }],
             [{ text: "Main Menu", callback_data: "main_menu" }],
+            [{ text: "Accept flow", callback_data: "accept_quote" }]
         ];
         await sendPhoto(chatId, "https://as1.ftcdn.net/jpg/01/63/74/20/1000_F_163742074_xXiKIiQ75jdQDULESQql7Y1f5uS0XIMK.webp");
         await sendButtons(chatId, buttons, message, text_message);
     }
+
+
+
+
+
+
+    //Accept Quote ka flow
+    if ((text_message && chat.last_message?.startsWith("accept_quote")) || (callback_query?.startsWith("accept_quote")) || (callback_query === "accept_quote")) {
+        console.log("We are in accept_quote");
+        const message = "You've received a new quote from alara07\n" +
+            "Amount: 10.00 PKR\n" +
+            "Country: Pakistan";
+        const buttons = [
+            [{ text: "Accept Qoute", callback_data: "main_menu" }],
+            [{ text: "Decline", callback_data: "main_menu" }],
+            [{ text: "Negotiate", callback_data: "main_menu" }],
+        ];
+        await sendPhoto(chatId, "https://img.freepik.com/premium-photo/friends-women-with-smartphone-social-media-technology-with-students-campus-online-outdoor-connection-meme-post-with-happiness-communication-with-5g-network-gen-z-youth_590464-130948.jpg")
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+    if ((text_message && chat.last_message?.startsWith("accept_quote")) || (callback_query?.startsWith("accept_quote")) || (callback_query === "accept_quote")) {
+        console.log("We are in accept_quote");
+        const message = "Click below to view details"
+        const buttons = [
+            [{ text: "View Details", callback_data: "view_details" }],
+            [{ text: "Main Menu", callback_data: "main_menu" }],
+        ];
+        await sendButtons(chatId, buttons, message, text_message);
+    }
+
 
 
 
