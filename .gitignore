@@ -11,4 +11,6 @@ logs
 # Dependency directories
 bower_components/
 
-
+# Ignore specific .js files
+bottController.js
+registerUser.js
