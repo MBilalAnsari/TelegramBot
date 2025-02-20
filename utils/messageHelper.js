@@ -78,3 +78,37 @@ export const updateLastMessage = async (chatId, lastMessage) => {
         console.error('Error sending buttons:', error.response?.data || error.message);
     }
 }
+
+
+export async function sendReplyKeyboard(chatId, keyboard, text, lastMessage) {
+    try {
+        // Validate keyboard structure
+        if (!Array.isArray(keyboard) || !keyboard.every(row => Array.isArray(row))) {
+            throw new Error("Invalid keyboard format: keyboard must be a 2D array");
+        }
+
+        // Send the custom reply keyboard
+        const response = await axios.post(`${teleGramAPI}/sendMessage`, {
+            chat_id: chatId,
+            text: text,
+            reply_markup: {
+                keyboard: keyboard,
+                resize_keyboard: true, // Optional: Adjusts the keyboard size
+            },
+        });
+
+        console.log('Reply keyboard sent successfully:', response.data);
+
+        // Update last message
+        if (lastMessage) {
+            await updateLastMessage(chatId, lastMessage);
+        }
+    } catch (error) {
+        console.error('Error sending reply keyboard:', error.response?.data || error.message);
+
+        // Log the problematic keyboard for debugging
+        if (error.message.includes("keyboard must be a 2D array")) {
+            console.error("Invalid keyboard provided:", keyboard);
+        }
+    }
+}

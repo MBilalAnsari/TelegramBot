@@ -1,6 +1,6 @@
 
 // import { text } from "body-parser";
-import { sendPhoto, sendMessage, sendButtons } from "../utils/messageHelper.js";
+import  { sendPhoto, sendMessage, sendButtons,sendReplyKeyboard } from "../utils/messageHelper.js";
 export async function registerUsers(chatId, payload, chat, text_message) {
     console.log("text_message in registerUser", text_message)
     // const text_message = data.message.text;
@@ -14,7 +14,7 @@ export async function registerUsers(chatId, payload, chat, text_message) {
             [{ text: "Change Language", callback_data: "language_change" }],
         ];
         await sendButtons(chatId, buttons, buttonText, "connect");
-        console.log("we are in register template")
+        console.log("we are in register template") 
     }
     // Agar user "Register" button click karta hai
     else if (payload === "register_template" && chat.last_message?.startsWith("connect")) {
@@ -59,20 +59,45 @@ export async function registerUsers(chatId, payload, chat, text_message) {
     }
     // Main menu par wapas jane ka option
     else if (payload === "main_menu" || chat.last_message === "register_0") {
-        console.log("Going to main menu");
-        const message = "Welcome back! Need to make a transaction? Select from the options below🚀👇";
-        const buttons = [
-            [{ text: "Wallet Overview 📒", callback_data: "wallet_overview" }],
-            [{ text: "Initiate Payment 💰", callback_data: "initiate_payment" }],
-            [{ text: "My Transactions 📑", callback_data: "my_transactions" }],
-            [{ text: "QR QuickPay 🔢", callback_data: "qr_quickpay" }],
-            [{ text: "My QR Code 🏷️", callback_data: "my_qr_code" }],
-            [{ text: "Explore More 🔍", callback_data: "explore_more" }],
-            [{ text: "Change Language 🌍", callback_data: "language_change" }],
-            [{ text: "Chat with us 💬", callback_data: "chat_with_us" }],
-            [{ text: "Run Recieve Req flow", callback_data: "recieve_request" }] //ye ek temp button hai recieve req flow ko run karne ke liye
-        ];
-        await sendButtons(chatId, buttons, message, "Opt_all");
+        // console.log("Going to main menu");
+        // const message = "Welcome back! Need to make a transaction? Select from the options below🚀👇";
+        // const buttons = [
+        //     [{ text: "Wallet Overview 📒", callback_data: "wallet_overview" }],
+        //     [{ text: "Initiate Payment 💰", callback_data: "initiate_payment" }],
+        //     [{ text: "My Transactions 📑", callback_data: "my_transactions" }],
+        //     [{ text: "QR QuickPay 🔢", callback_data: "qr_quickpay" }],
+        //     [{ text: "My QR Code 🏷️", callback_data: "my_qr_code" }],
+        //     [{ text: "Explore More 🔍", callback_data: "explore_more" }],
+        //     [{ text: "Change Language 🌍", callback_data: "language_change" }],
+        //     [{ text: "Chat with us 💬", callback_data: "chat_with_us" }],
+        //     [{ text: "Run Recieve Req flow", callback_data: "recieve_request" }] //ye ek temp button hai recieve req flow ko run karne ke liye
+        // ];
+        // const buttons = {
+        //     reply_markup: {
+        //       keyboard: [
+        //         ["💰 Balance", "💸 Send Money"],
+        //         ["📥 Request Money", "📜 Transaction History"],
+        //         ["💳 Virtual Card", "🏦 vIBAN"],
+        //         ["📲 QR Quick Pay", "🔳 My QR Code"],
+        //         ["🌍 Change Language", "🔍 Explore More"],
+        //         ["🔙 Main Menu"]
+        //       ],
+        //       resize_keyboard: true
+        //     }
+        //   };
+          
+        // await sendButtons(chatId, buttons, message, "Opt_all");
+        const mainMenuKeyboard = [
+                ["Wallet Overview 📒", "Initiate Payment 💰"],
+                ["My Transactions 📑", "QR QuickPay 🔢"],
+                ["My QR Code 🏷️", "Explore More 🔍"],
+                ["Change Language 🌍", "🔙 Main Menu"],
+                ["Chat with us 💬"], // Ensure it's the last button
+            ];
+            
+        
+        await sendReplyKeyboard(chatId, mainMenuKeyboard, "Welcome to the Main Menu! Choose an option:", "main_menu");
+        
     }
     // QR QuickPay ka flow
     else if ((chat.last_message?.startsWith("qr_quickpay")) || (payload?.startsWith("qr_quickpay")) || (payload?.startsWith("qr_quickpay"))) {
