@@ -58,59 +58,46 @@ export async function registerUsers(chatId, payload, chat, text_message) {
         await sendMessage(chatId, "Business account registration will come soon.", buttons, "register_2");
     }
     // Main menu par wapas jane ka option
-    else if (payload === "main_menu" || chat.last_message === "register_0") {
-        // console.log("Going to main menu");
-        // const message = "Welcome back! Need to make a transaction? Select from the options below🚀👇";
-        // const buttons = [
-        //     [{ text: "Wallet Overview 📒", callback_data: "wallet_overview" }],
-        //     [{ text: "Initiate Payment 💰", callback_data: "initiate_payment" }],
-        //     [{ text: "My Transactions 📑", callback_data: "my_transactions" }],
-        //     [{ text: "QR QuickPay 🔢", callback_data: "qr_quickpay" }],
-        //     [{ text: "My QR Code 🏷️", callback_data: "my_qr_code" }],
-        //     [{ text: "Explore More 🔍", callback_data: "explore_more" }],
-        //     [{ text: "Change Language 🌍", callback_data: "language_change" }],
-        //     [{ text: "Chat with us 💬", callback_data: "chat_with_us" }],
-        //     [{ text: "Run Recieve Req flow", callback_data: "recieve_request" }] //ye ek temp button hai recieve req flow ko run karne ke liye
-        // ];
-        // const buttons = {
-        //     reply_markup: {
-        //       keyboard: [
-        //         ["💰 Balance", "💸 Send Money"],
-        //         ["📥 Request Money", "📜 Transaction History"],
-        //         ["💳 Virtual Card", "🏦 vIBAN"],
-        //         ["📲 QR Quick Pay", "🔳 My QR Code"],
-        //         ["🌍 Change Language", "🔍 Explore More"],
-        //         ["🔙 Main Menu"]
-        //       ],
-        //       resize_keyboard: true
-        //     }
-        //   };
+    else if (payload === "main_menu" || chat.last_message === "register_0"|| chat.last_message?.startsWith("Main Menu 🔙")) {
+        console.log("Going to main menu");
+        const message = "Welcome back! Need to make a transaction? Select from the options below🚀👇";
+        const buttons = [
+            [{ text: "Wallet Overview 📒", callback_data: "wallet_overview" }],
+            [{ text: "Initiate Payment 💰", callback_data: "initiate_payment" }],
+            [{ text: "My Transactions 📑", callback_data: "my_transactions" }],
+            [{ text: "QR QuickPay 🔢", callback_data: "qr_quickpay" }],
+            [{ text: "My QR Code 🏷️", callback_data: "my_qr_code" }],
+            [{ text: "Explore More 🔍", callback_data: "explore_more" }],
+            [{ text: "Change Language 🌍", callback_data: "language_change" }],
+            [{ text: "Chat with us 💬", callback_data: "chat_with_us" }],
+            [{ text: "Run Recieve Req flow", callback_data: "recieve_request" }] //ye ek temp button hai recieve req flow ko run karne ke liye
+        ];
           
-        // await sendButtons(chatId, buttons, message, "Opt_all");
+        await sendButtons(chatId, buttons, message, "Opt_all");
         const mainMenuKeyboard = [
                 ["Wallet Overview 📒", "Initiate Payment 💰"],
                 ["My Transactions 📑", "QR QuickPay 🔢"],
                 ["My QR Code 🏷️", "Explore More 🔍"],
-                ["Change Language 🌍", "🔙 Main Menu"],
+                ["Change Language 🌍", "Main Menu 🔙"],
                 ["Chat with us 💬"], // Ensure it's the last button
             ];
             
         
-        await sendReplyKeyboard(chatId, mainMenuKeyboard, "Welcome to the Main Menu! Choose an option:", "main_menu");
+        await sendReplyKeyboard(chatId, mainMenuKeyboard, "Welcome to the Main Menu! Choose an option:", text_message);
         
     }
     // QR QuickPay ka flow
-    else if ((chat.last_message?.startsWith("qr_quickpay")) || (payload?.startsWith("qr_quickpay")) || (payload?.startsWith("qr_quickpay"))) {
-        console.log("we are in Qr QuickPay");
-        const message = "Scan, Pay and Go with Ease Embrance QR code wallet Evolution";
-        const buttons = [
-            [{ text: "Alphanumeric Code", callback_data: "alpha_num_code" }],
-            [{ text: "Scan Qr Code", callback_data: "scan_qr_code" }],
-            [{ text: "Main Menu", callback_data: "main_menu" }],
-        ]
-        await sendPhoto(chatId, "https://miro.medium.com/v2/resize:fit:828/format:webp/1*7cmKvNClOo6K2cHSXsbW3w.png")
-        await sendButtons(chatId, buttons, message, "qr_quickpay");
-    }
+    // else if ((chat.last_message?.startsWith("qr_quickpay")) || (payload?.startsWith("qr_quickpay")) || (payload?.startsWith("qr_quickpay"))) {
+    //     console.log("we are in Qr QuickPay");
+    //     const message = "Scan, Pay and Go with Ease Embrance QR code wallet Evolution";
+    //     const buttons = [
+    //         [{ text: "Alphanumeric Code", callback_data: "alpha_num_code" }],
+    //         [{ text: "Scan Qr Code", callback_data: "scan_qr_code" }],
+    //         [{ text: "Main Menu", callback_data: "main_menu" }],
+    //     ]
+    //     await sendPhoto(chatId, "https://miro.medium.com/v2/resize:fit:828/format:webp/1*7cmKvNClOo6K2cHSXsbW3w.png")
+    //     await sendButtons(chatId, buttons, message, "qr_quickpay");
+    // }
 
 
 
@@ -151,12 +138,7 @@ export async function registerUsers(chatId, payload, chat, text_message) {
         await sendPhoto(chatId, "https://nmgprod.s3.amazonaws.com/media/files/c4/89/c489299ae466b3478d86d95c60d07b7a/cover_image_1659989989.jpg.760x400_q85_crop_upscale.jpg")
         await sendButtons(chatId, buttons, message, "Usd_Curr");
     }
-    // User se QR Code ya Alphanumeric Code mangwana
-    else if ((chat.last_message?.startsWith("alpha_num_code")) || (payload?.startsWith("alpha_num_code")) || (payload === "alpha_num_code")) {
-        console.log("we are in alpha_num_code");
-        const message = "Please enter the alphanumeric wallet code";
-        await sendMessage(chatId, message, "alpha_num_code");
-    }
+  
     // scan qr code ka flow
     // else if ((chat.last_message?.startsWith("scan_qr_code")) || (payload?.startsWith("scan_qr_code")) || (payload === "scan_qr_code")) {
     //     console.log("we are in scan_qr_code");
