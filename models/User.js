@@ -61,6 +61,7 @@ const userSchema = new mongoose.Schema({
 const telegramBot = mongoose.Schema({
     recipient: { type: String, required: false },
     last_message: { type: String, required: false },
+    save_value : {type: String, required: false},
     last_message_time: { type: Date, required: false },
     account_connected: { type: Boolean, required: false },
     selected_language: { type: String, required: false },

@@ -1,6 +1,11 @@
 import { sendPhoto, sendMessage, sendButtons, sendReplyKeyboard } from "../../messageHelper.js"
 
-export async function quickPay(chatId, callback_query, chat, text_message , image_payloads) {
+export async function quickPay(chatId, callback_query, chat, save_value , image_payloads, data) {
+    console.log(callback_query, "callback agayi qr ke ander")
+    console.log("datttttttttt" , data)
+    console.log("saaaaaave value" , save_value)
+    let text_message = save_value
+    console.log("texxt value" , text_message)
 
     if ((chat.last_message?.startsWith("qr_quickpay")) || (callback_query?.startsWith("qr_quickpay")) || (text_message?.startsWith("QR QuickPay 🔢"))) {
         console.log("we are in Qr QuickPay");
@@ -11,13 +16,14 @@ export async function quickPay(chatId, callback_query, chat, text_message , imag
             [{ text: "Main Menu", callback_data: "main_menu" }],
         ]
         await sendPhoto(chatId, "https://miro.medium.com/v2/resize:fit:828/format:webp/1*7cmKvNClOo6K2cHSXsbW3w.png")
-        await sendButtons(chatId, buttons, message, "qr_quickpay");
+        await sendButtons(chatId, buttons, message);
+
     }
       // User se QR Code ya Alphanumeric Code mangwana
     if ((chat.last_message?.startsWith("alpha_num_code")) || (callback_query?.startsWith("alpha_num_code")) || (callback_query === "alpha_num_code")) {
         console.log("we are in alpha_num_code");
         const message = "Please enter the alphanumeric wallet code";
-        await sendMessage(chatId, message, "alpha_num_code");
+        await sendMessage(chatId, message, "qr_quickpay");
     }  
     if (text_message && chat.last_message?.startsWith("alpha_num_code") && text_message === "4WOHZT9V") {
         console.log("we are in alphanum_wallet_code");
@@ -185,5 +191,7 @@ export async function quickPay(chatId, callback_query, chat, text_message , imag
         ];
         // Sending the message with buttons
         await sendButtons(chatId, buttons, message, text_message);
+        
     }
+   
 }

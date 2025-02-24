@@ -69,9 +69,10 @@ export const handleUpdates = async (req, res) => {
         // console.log("Updating existing chat:", chatId);
         // console.log("chat.last_meshihihsage", chat.last_message);
         if (text_message !== "4WOHZT9V") {
-            let last_message;
+
             // chat.last_message =  await TelegramBot.findOneAndUpdate({ last_message: last_message }) || text_message || "unknown";
             chat.last_message = callback_query || text_message || "unknown";
+            chat.save_value = chat.last_message;
             chat.last_message_time = currentTime;
             await chat.save();
         }
@@ -95,12 +96,13 @@ export const handleUpdates = async (req, res) => {
         await sendPhoto(chatId, "https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg");
         await sendButtons(chatId, buttons, "Welcome onboard!");
     }
-    if (true) {
+    if (callback_query) {
         console.log("Handling callback query:", callback_query);
         console.log("text_message", text_message)
+        console.log("save_value", chat.save_value)
+        console.log("lasssssssst" , chat.last_message)
         await registerUsers(chatId, callback_query, chat, text_message);
 
-        await quickPay(chatId, callback_query, chat, text_message, image_payloads);
 
         await qrCode(chatId, callback_query, chat, text_message)
 
@@ -110,14 +112,19 @@ export const handleUpdates = async (req, res) => {
 
         await changeLanguage(chatId, callback_query, chat, text_message)
 
-        await myTransaction(chatId, callback_query, chat, text_message )
 
-        await sendQuote(chatId, callback_query, chat, text_message)
+        await sendQuote(chatId, callback_query, chat, text_message, video_payloads)
     }
 
-    // if (chat.last_message?.startsWith("qr_quickpay") && (callback_query?.startsWith("qr_quickpay") || callback_query?.startsWith("QR QuickPay"))) {
+    if (callback_query === "my_transactions") {
+        await myTransaction(chatId, callback_query, chat, text_message)
+        
+    }
 
-    // }
+
+    if (chat.save_value?.startsWith("qr_quickpay") || (callback_query?.startsWith("qr_quickpay") || callback_query?.startsWith("QR QuickPay")||(chat.last_message === "qr_quickpay"))) {
+        await quickPay(chatId, callback_query, chat, chat.save_value , image_payloads, data);
+    }
 
     // yahan se hassan ka code hai
     // ye cond invite someone ke phone number per hai
@@ -147,11 +154,11 @@ export const handleUpdates = async (req, res) => {
     //     await sendButtons(chatId, buttons, message, "qr_quickpay");
     // }
     // Wallet overview ka flow
-   
-  
 
 
-   
+
+
+
     // ye cond invite someone ke email per hai
     else if (chat.last_message?.startsWith("abc@gmail.com") && chat.last_message?.includes("abc@gmail.com")) {
 
@@ -369,25 +376,17 @@ export const handleUpdates = async (req, res) => {
 
 
 
-    // e-sim ka flow
-    if ((chat.last_message?.startsWith("e_sim")) || (callback_query?.startsWith("e_sim")) || (callback_query === "e_sim")) {
-        console.log("we are in e_sim");
-        const message = "Purchase an eSIM 📶 for immediate connection - Global Coverage - Coming Soon!";
-        const buttons = [
-            [{ text: "Main Menu", callback_data: "main_menu" }]
-        ]
-        await sendButtons(chatId, buttons, message, "e_sim");
-    }
-
-
- 
+    //
 
 
 
 
 
-   
-  
+
+
+
+
+
 
     return res.sendStatus(200); // ✅ Respond with 200 OK to prevent Telegram retries
 };

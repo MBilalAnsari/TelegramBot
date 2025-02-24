@@ -2,6 +2,7 @@ import { sendPhoto, sendMessage, sendButtons, sendReplyKeyboard } from "../../me
 
 
 export async function exploreMore(chatId, callback_query, chat, text_message , image_payloads) {
+    console.log("text messsssssssssg" , text_message)
     // explore more ka flow
     if ((chat.last_message?.startsWith("explore_more")) || (callback_query?.startsWith("explore_more")) || text_message?.startsWith("Explore More")) {
         console.log("we are in explore_more");
@@ -13,6 +14,15 @@ export async function exploreMore(chatId, callback_query, chat, text_message , i
         ]
         await sendPhoto(chatId, "https://egyptianstreets.com/wp-content/uploads/2024/11/en-1-1024x576-1.png");
         await sendButtons(chatId, buttons, message, text_message);
+    }
+    // e-sim ka flow
+    if ((chat.last_message?.startsWith("e_sim")) || (callback_query?.startsWith("e_sim")) || (callback_query === "e_sim")) {
+        console.log("we are in e_sim");
+        const message = "Purchase an eSIM 📶 for immediate connection - Global Coverage - Coming Soon!";
+        const buttons = [
+            [{ text: "Main Menu", callback_data: "main_menu" }]
+        ]
+        await sendButtons(chatId, buttons, message, "e_sim");
     }
     // mobile airtime ka flow
     if ((text_message && chat.last_message?.startsWith("mobile_airtime")) || (callback_query?.startsWith("mobile_airtime")) || (callback_query === "mobile_airtime")) {

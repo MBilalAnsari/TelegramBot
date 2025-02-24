@@ -1,6 +1,6 @@
 import { sendPhoto, sendMessage, sendButtons, sendReplyKeyboard } from "../../messageHelper.js"
 
-export async function sendQuote(chatId, callback_query, chat, text_message) {
+export async function sendQuote(chatId, callback_query, chat, text_message, video_payloads) {
      // Initiate payment ka flow
      if ((text_message && chat.last_message?.startsWith("initiate_payment")) || (callback_query?.startsWith("initiate_payment")) || text_message?.startsWith("Initiate Payment 💰")) {
         console.log("we are in Initiate Payment 💰");
