@@ -100,32 +100,118 @@ export const handleUpdates = async (req, res) => {
         console.log("Handling callback query:", callback_query);
         console.log("text_message", text_message)
         console.log("save_value", chat.save_value)
-        console.log("lasssssssst" , chat.last_message)
-        await registerUsers(chatId, callback_query, chat, text_message);
-
-
-        await qrCode(chatId, callback_query, chat, text_message)
-
-        await exploreMore(chatId, callback_query, chat, text_message)
-
-        await walletOverview(chatId, callback_query, chat, text_message)
-
-        await changeLanguage(chatId, callback_query, chat, text_message)
-
-
-        await sendQuote(chatId, callback_query, chat, text_message, video_payloads)
-    }
-
-    if (callback_query === "my_transactions") {
-        await myTransaction(chatId, callback_query, chat, text_message)
+        console.log("lasssssssst", chat.last_message)
         
+        
+        await qrCode(chatId, callback_query, chat, text_message)
+        
+        await exploreMore(chatId, callback_query, chat, text_message)
+        
+        await walletOverview(chatId, callback_query, chat, text_message)
+        
+        await changeLanguage(chatId, callback_query, chat, text_message)
+        
+        
+        await sendQuote(chatId, callback_query, chat, text_message, video_payloads)
+        
+        await quickPay(chatId, callback_query, chat, chat.save_value, image_payloads, data);
+        
+        await myTransaction(chatId, callback_query, chat, chat.save_value)
+        
+        await registerUsers(chatId, callback_query, chat, text_message);
     }
 
 
-    if (chat.save_value?.startsWith("qr_quickpay") || (callback_query?.startsWith("qr_quickpay") || callback_query?.startsWith("QR QuickPay")||(chat.last_message === "qr_quickpay"))) {
-        await quickPay(chatId, callback_query, chat, chat.save_value , image_payloads, data);
-    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // else if ((chat.last_message?.startsWith("my_transactions")) || (callback_query?.startsWith("my_transactions")) || (callback_query === "my_transactions")) {
+    //     console.log("we are in my transactions");
+    //     const message = "📌 Transaction ID: TXN001\n" +
+    //     "📅 Date: 14-Feb-2025 | 🕒 Time: 10:30 AM\n" +
+    //     "💰 Amount: +1,500 PKR\n" +
+    //     "✅ Status: Successful\n" +
+    //     "📝 Description: Salary Deposit\n\n" +
+
+    //     "📌 Transaction ID: TXN002\n" +
+    //     "📅 Date: 13-Feb-2025 | 🕒 Time: 3:45 PM\n" +
+    //     "💰 Amount: -500 PKR\n" +
+    //     "✅ Status: Successful\n" +
+    //     "📝 Description: Bill Payment - Electricity\n\n" +
+
+    //     "📌 Transaction ID: TXN003\n" +
+    //     "📅 Date: 12-Feb-2025 | 🕒 Time: 11:10 AM\n" +
+    //     "💰 Amount: -200 PKR\n" +
+    //     "❌ Status: Failed\n" +
+    //     "📝 Description: Mobile Top-up\n\n" +
+
+    //     "📌 Transaction ID: TXN004\n" +
+    //     "📅 Date: 11-Feb-2025 | 🕒 Time: 9:00 AM\n" +
+    //     "💰 Amount: +10,000 PKR\n" +
+    //     "✅ Status: Successful\n" +
+    //     "📝 Description: Freelance Payment\n\n" +
+
+    //     "📌 Transaction ID: TXN005\n" +
+    //     "📅 Date: 10-Feb-2025 | 🕒 Time: 7:15 PM\n" +
+    //     "💰 Amount: -1,200 PKR\n" +
+    //     "✅ Status: Successful\n" +
+    //     "📝 Description: Shopping - Groceries\n\n" +
+
+    //     "📌 Transaction ID: TXN006\n" +
+    //     "📅 Date: 09-Feb-2025 | 🕒 Time: 5:25 PM\n" +
+    //     "💰 Amount: -300 PKR\n" +
+    //     "⏳ Status: Pending\n" +
+    //     "📝 Description: Online Subscription\n\n" +
+
+    //     "📌 Transaction ID: TXN007\n" +
+    //     "📅 Date: 08-Feb-2025 | 🕒 Time: 2:50 PM\n" +
+    //     "💰 Amount: +8,000 PKR\n" +
+    //     "✅ Status: Successful\n" +
+    //     "📝 Description: Friend Transfer\n\n" +
+
+    //     "📌 Transaction ID: TXN008\n" +
+    //     "📅 Date: 07-Feb-2025 | 🕒 Time: 4:30 PM\n" +
+    //     "💰 Amount: -650 PKR\n" +
+    //     "✅ Status: Successful\n" +
+    //     "📝 Description: Food Delivery\n\n" +
+
+    //     "📌 Transaction ID: TXN009\n" +
+    //     "📅 Date: 06-Feb-2025 | 🕒 Time: 1:00 PM\n" +
+    //     "💰 Amount: -2,500 PKR\n" +
+    //     "❌ Status: Failed\n" +
+    //     "📝 Description: Flight Booking\n\n" +
+
+    //     "📌 Transaction ID: TXN010\n" +
+    //     "📅 Date: 05-Feb-2025 | 🕒 Time: 10:00 AM\n" +
+    //     "💰 Amount: +4,500 PKR\n" +
+    //     "✅ Status: Successful\n" +
+    //     "📝 Description: Bonus Reward";
+
+    //     console.log(message);
+
+    //     const buttons = [
+    //         [{ text: "Main Menu", callback_data: "main_menu" }],
+    //     ];
+    //     await sendButtons(chatId, buttons, message, "register_0")
+    // }
     // yahan se hassan ka code hai
     // ye cond invite someone ke phone number per hai
     // else if (chat.text?.trim().startsWith("+923001234567") || chat.last_message?.trim().includes("+923001234567") || (chat.last_message === "+923001234567")) {
